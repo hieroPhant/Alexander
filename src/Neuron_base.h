@@ -3,11 +3,6 @@
 
 /*
 	(c) Jack Hall 2011, licensed under GNU GPL v3
-	Neuron_base is a single-Node interface class. It provides an interface for the 
-	fundamental independent element in a neural network: a Neuron. However, in the 
-	interest of keeping Alexander's interface and data structure separate from the 
-	implementation of neural computations, Neuron_base stores no data and performs
-	no computation. 
 */
 
 #include <iostream>
@@ -15,29 +10,34 @@
 #include "Benoit.h"
 
 class Neuron_base {
-/*
-	
-*/
-
-private:
-	Neuron_base(); 	
-	Neuron_base& operator=(const Neuron_base& rhs);
-	
 protected:
 	Node<double,double> connections;
+	std::deque<double> state;
 	
 public:
 	bool trainable;	
 	
-	Neuron_base(const bool bTrainable=true)
-	: connections(), trainable(bTrainable) {}
-	Neuron_base(const Neuron_base& rhs) 
-	: connections(rhs.connections, trainable(rhs.trainable) {}
+	Neuron_base(); 
+	Neuron_base(const double dBias);
+	Neuron_base(Index<double,double>& cIndex, const double dBias=0);
+	Neuron_base(const Neuron_base& rhs)=delete;
+	Neuron_base(Neuron_base&& rhs);
+	Neuron_base& operator=(const Neuron_base& rhs)=delete;
+	Neuron_base& operator=(Neuron_base&& rhs);
 	virtual ~Neuron_base();
-	virtual Node& fire() = 0;
-	virtual Node& backPropagate(const unsigned int nStepsBack) = 0;
+	
+	virtual void fire() = 0;
+	virtual void backPropagate(const unsigned int nStepsBack) = 0;
+	
+	void add_input(const unsigned int nOrigin, double dWeight);
 	void remove_input(Connection_base* pOldIn);
-	void remove_output(Connection_base* pOldOut);	//unique to Neuron_base
+	void add_output(const unsigned int nTarget);
+	void remove_output(Connection_base* pOldOut);
+	void clear();
+	
+	unsigned int get_ID();
+	void set_ID(const unsigned int nID);
+	void switch_network(Index<double,double>& cIndex);
 };
 
 #endif

@@ -1,25 +1,20 @@
 #ifndef Neuron_linear_h
 #define Neuron_linear_h
 
-template<T>
-class Neuron_linear : public Neuron<T> {
+class Neuron_linear : public Neuron_base {
 public:
-	Neuron_linear(	const unsigned int nSamples=1,		//size of batch
-					const unsigned int nTimeSteps=1,	//number of time steps to backpropagate through
-					const T tBias=0.0,
-					const bool bTrainable=true)
-		:	Neuron<T>(nSamples, nTimeSteps, tBias, bTrainable) {}
-	Neuron_linear(const Neuron_linear<T>& cSource) 
-		:	Neuron<T>(cSource) {}
-	Node& fire();
-	Node& backPropagate(const unsigned int nStepsBack=0);
+	Neuron_linear(  Index<double,double>& cIndex,
+			const double dBias=0.0)
+		: Neuron_base(cIndex, dBias) {}
+	Neuron_linear(const Neuron_linear& rhs);
+	void fire();
+	void backPropagate(const unsigned int nStepsBack=0);
 };
 
 //////////////////////////////////////////////
 //////////////////////////////////////////////
 
-template<typename T>
-Node& Neuron<T>::fire() { //not finished (step sequence)
+void Neuron_linear::fire() { //not finished (step sequence)
 	using namespace std;
 	msSignal.initializeStep(mtBias);	//initialize each current sample in Signal with the bias
 	deque<Connection_base*>::iterator it = mqConnIn.begin();
@@ -43,7 +38,7 @@ Node& Neuron<T>::fire() { //not finished (step sequence)
 }
 
 template<typename T>
-Node& Neuron<T>::backPropagate(const unsigned int nStepsBack) { //not finished (step sequence)
+void Neuron_linear::backPropagate(const unsigned int nStepsBack) { //not finished (step sequence)
 	using namespace std;
 	msBuffer.initializeStep(0.0);		//set all current samples in Buffer to zero
 	deque<Connection_base*>::iterator it = mqConnOut.begin();
