@@ -2,14 +2,14 @@
 #define Neuron_h
 
 /*
-	(c) Jack Hall 2011, licensed under GNU LGPL v3
-	The Neuron class is the computational core of Benoit. It inherits its interface 
+	(c) Jack Hall 2011, licensed under GNU GPL v3
+	The Neuron class is the computational core of Alexander. It inherits its interface 
 	and network structure from Neuron_base. All signal and error data is stored in
 	Neurons, and Neurons perform or initiate all neural computation. This separation
 	of network structure and interface from implementation will hopefully make Benoit
 	more flexible and extensible.
 	
-	Neuron, like Connection and other non-interface classes in Benoit, is templated for
+	Neuron, like Connection and other non-interface classes in Alexander, is templated for
 	any floating-point arithmetic. Because neural networks have inherent uncertainty, the 
 	default template type is a float so as not to waste memory with useless precision. I hope 
 	in the future to implement a fixed-point specialization of Benoit's implementation
@@ -25,7 +25,6 @@
 #include "Connection.h"
 #include "State.h"
 
-template<typename T=float>
 class Neuron : public Neuron_base {
 /*
 	- Inherits from Neuron_base, which defines the network structure and interface. Like 

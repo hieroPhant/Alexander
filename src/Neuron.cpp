@@ -1,7 +1,7 @@
 #ifndef Neuron_cpp
 #define Neuron_cpp
 
-//(c) Jack Hall 2011, licensed under GNU LGPL v3
+//(c) Jack Hall 2011, licensed under GNU GPL v3
 
 template<typename T>
 State<T>& Neuron<T>::add(Connection_base* pConn) {
