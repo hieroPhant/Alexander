@@ -15,7 +15,7 @@ protected:
 	std::deque<double> state;
 	
 public:
-	bool trainable;	
+	bool trainable;	//may need a way to set individual Links as trainable
 	
 	Neuron_base(); 
 	Neuron_base(const double dBias);
@@ -27,12 +27,13 @@ public:
 	virtual ~Neuron_base();
 	
 	virtual void fire() = 0;
-	virtual void backPropagate(const unsigned int nStepsBack) = 0;
+	virtual void backpropagate(const unsigned int nStepsBack) = 0;
 	
-	void add_input(const unsigned int address, double dWeight);
-	void remove_input(const unsigned int address);
-	void clear();
-	unsigned int get_ID();
+	void add_input(const unsigned int address, double dWeight) 
+		{ connections.add_input(nOrigin, dWeight); }
+	void remove_input(const unsigned int address) { connections.remove_input(nOrigin); }
+	void clear() { connections.clear(); }
+	unsigned int get_ID() { return connections.ID; }
 };
 
 #endif

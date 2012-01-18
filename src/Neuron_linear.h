@@ -8,7 +8,7 @@ public:
 		: Neuron_base(cIndex, dBias) {}
 	Neuron_linear(const Neuron_linear& rhs);
 	void fire();
-	void backPropagate(const unsigned int nStepsBack=0);
+	void backpropagate(const unsigned int nStepsBack=0);
 };
 
 //////////////////////////////////////////////
@@ -38,7 +38,7 @@ void Neuron_linear::fire() { //not finished (step sequence)
 }
 
 template<typename T>
-void Neuron_linear::backPropagate(const unsigned int nStepsBack) { //not finished (step sequence)
+void Neuron_linear::backpropagate(const unsigned int nStepsBack) { //not finished (step sequence)
 	using namespace std;
 	msBuffer.initializeStep(0.0);		//set all current samples in Buffer to zero
 	deque<Connection_base*>::iterator it = mqConnOut.begin();
