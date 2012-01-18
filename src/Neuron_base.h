@@ -29,15 +29,10 @@ public:
 	virtual void fire() = 0;
 	virtual void backPropagate(const unsigned int nStepsBack) = 0;
 	
-	void add_input(const unsigned int nOrigin, double dWeight);
-	void remove_input(Connection_base* pOldIn);
-	void add_output(const unsigned int nTarget);
-	void remove_output(Connection_base* pOldOut);
+	void add_input(const unsigned int address, double dWeight);
+	void remove_input(const unsigned int address);
 	void clear();
-	
 	unsigned int get_ID();
-	void set_ID(const unsigned int nID);
-	void switch_network(Index<double,double>& cIndex);
 };
 
 #endif
