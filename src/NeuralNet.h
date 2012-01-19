@@ -1,9 +1,6 @@
 #ifndef NeuralNet_h
 #define NeuralNet_h
-
-/*
-	(c) Jack Hall 2011, licensed under GNU GPL v3
-*/
+//(c) Jack Hall 2011, licensed under GNU GPL v3
 
 #include "Benoit.h"
 #include <list>

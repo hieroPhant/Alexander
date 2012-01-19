@@ -1,5 +1,6 @@
 #ifndef Neuron_sigmoid_h
 #define Neuron_sigmoid_h
+//(c) Jack Hall 2011, licensed under GNU GPL v3
 
 class Neuron_linear : public Neuron_base {
 private:
