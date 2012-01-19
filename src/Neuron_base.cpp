@@ -31,12 +31,12 @@ namespace alex {
 	
 	void Neuron_base::add_input(const unsigned int address, Neuron_base::weight_type tWeight) {
 		forward.add_input(address, tWeight);
-		backward.get_index().find(address)->add_input(backward.ID, tWeight); //better way?
+		backward.add_output(address, tWeight); //different address!
 	}
 	
 	void Neuron_base::remove_input(const unsigned int address) {
 		forward.remove_input(address);
-		backward.get_index().find(address)->remove_input(backward.ID);
+		backward.remove_output(address); //different address!
 	}
 	
 	void Neuron_base::clear() {

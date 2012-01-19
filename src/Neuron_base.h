@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <deque>
-#include "Benoit.h"
+
 namespace alex {
 
 	class Neuron_base {
