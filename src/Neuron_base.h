@@ -11,6 +11,7 @@ namespace alex {
 	public:
 		typedef std::pair<double,bool> weight_type;
 		typedef double signal_type;
+		const char neuron_type; //FIELD
 
 		Neuron_base(); 
 		Neuron_base(const signal_type tBias);
@@ -21,7 +22,7 @@ namespace alex {
 		virtual ~Neuron_base();
 	
 		virtual void fire() = 0;
-		virtual void backpropagate(const unsigned int nStepsBack) = 0;
+		virtual void backpropagate(const unsigned int steps_back=0) = 0;
 	
 		void add_input(const unsigned int address, const weight_type tWeight);
 		void remove_input(const unsigned int address); 

@@ -3,14 +3,15 @@
 //(c) Jack Hall 2011, licensed under GNU GPL v3
 
 #include <list>
-#include <map> //used temporarily for copying
 
 namespace alex {
 
 	class NeuralNet {
 	private:
-		Index<double,double> index;
-		std::list< Neuron_base > neurons;
+		Index< std::pair<double,bool>, double> forward_index;
+		Index<double,double> backward_index;
+		std::map<unsigned int, unsigned int>
+		std::list<Neuron_base> neurons;
 	
 	public:
 		NeuralNet() = default;
@@ -19,6 +20,17 @@ namespace alex {
 		NeuralNet& operator=(const NeuralNet& rhs);
 		NeuralNet& operator=(NeuralNet&& rhs);
 		~NeuralNet() = default;
+		
+		unsigned int add_sigmoid(const double bias, const bool trainable=true);
+		unsigned int add_linear(const double bias, const bool trainable=true);
+		
+		void connect(const unsigned int origin, 
+			     const unsigned int target,
+			     const double weight,
+			     const bool trainable=true);
+		void connect(const unsigned int origin,
+			     const unsigned int target,
+			     const std::pair<double, bool> weight)
 		
 		void run();
 		void train();
