@@ -10,7 +10,6 @@ namespace alex {
 	private:
 		Index< std::pair<double,bool>, double> forward_index;
 		Index<double,double> backward_index;
-		std::map<unsigned int, unsigned int>
 		std::list<Neuron_base> neurons;
 	
 	public:
@@ -21,8 +20,14 @@ namespace alex {
 		NeuralNet& operator=(NeuralNet&& rhs);
 		~NeuralNet() = default;
 		
+		unsigned int add_tanh(const double bias, const bool trainable=true);
+		unsigned int add_tanh(const std::pair<double,bool> bias);
 		unsigned int add_sigmoid(const double bias, const bool trainable=true);
+		unsigned int add_sigmoid(const std::pair<double,bool> bias);
 		unsigned int add_linear(const double bias, const bool trainable=true);
+		unsigned int add_linear(const std::pair<double,bool> bias);
+		unsigned int add_gaussian(const double bias, const bool trainable=true);
+		unsigned int add_gaussian(const std::pair<double,bool> bias);
 		
 		void connect(const unsigned int origin, 
 			     const unsigned int target,

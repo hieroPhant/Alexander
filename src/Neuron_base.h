@@ -13,12 +13,17 @@ namespace alex {
 		typedef double signal_type;
 		const char neuron_type; //FIELD
 
-		Neuron_base(); 
-		Neuron_base(const signal_type tBias);
+		Neuron_base() = delete;
+		explicit Neuron_base(const char chNeuron_type); 
+		Neuron_base(const char chNeuron_type, const weight_type tBias);
+		Neuron_base(const char chNeuron_type,
+			    Index<weight_type, signal_type>& fIndex, 
+			    Index<double,double>& bIndex, 
+			    const weight_type tBias);
 		Neuron_base(const Neuron_base& rhs);
 		Neuron_base(Neuron_base&& rhs);
 		Neuron_base& operator=(const Neuron_base& rhs);
-		Neuron_base& operator=(Neuron_base&& rhs)=delete;
+		Neuron_base& operator=(Neuron_base&& rhs) = delete;
 		virtual ~Neuron_base();
 	
 		virtual void fire() = 0;
