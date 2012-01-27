@@ -1,6 +1,8 @@
 #ifndef Neuron_gaussian_h
 #define Neuron_gaussian_h
 
+#include <math>
+
 /*
     Alexander: a neural networks library
     Copyright (C) 2011  Jack Hall
@@ -23,7 +25,7 @@
 
 class Neuron_gaussian : public Neuron_base {
 public:
-	Neuron_gaussian(  Index<Neuron_base::weight_type, Neuron_base::signal_type>& fIndex,
+	Neuron_gaussian(Index<Neuron_base::weight_type, Neuron_base::signal_type>& fIndex,
 			Index<double,double>& bIndex,
 			const Neuron_base::weight_type dBias)
 		: Neuron_base("l", fIndex, bIndex, dBias) {}
@@ -37,10 +39,44 @@ public:
 
 void Neuron_gaussian::fire() { 
 	
+	signal_type signal, energy = 0;
+	auto ip = forward.input_begin();
+	auto ipe = forward.input_begin();
+	while(ip != ipe) {
+		ip >> signal;
+		energy += ip->weight->first - signal;
+		++ip;
+	}
+	
+	Neuron_base::signal_type output = exp(energy*energy / bias->first);
+	
+	auto op = forward.output_begin();
+	auto ope = forward.output_end();
+	while(op != ope) {
+		op << output;
+		++op;
+	}
 }
 
 void Neuron_gaussian::backpropagate(const unsigned int steps_back) { 
 	
+	double gradient, partial = 0;
+	auto ip = backward.input_begin();
+	auto ipe = backward.input_end();
+	while(ip != ipe) {
+		ip >> partial;
+		//gather partials into gradient
+		++ip;
+	}
+	
+	double derivative; //calculate derivative of activation function
+	
+	auto op = backward.output_begin();
+	auto ope = backward.output_end();
+	while(op != ope) {
+		//output derivative to next Link (based on weight)
+		++op;
+	}
 }
 
 #endif

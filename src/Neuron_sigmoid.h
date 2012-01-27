@@ -37,10 +37,44 @@ public:
 
 void Neuron_sigmoid::fire() {
 	
+	signal_type signal, energy = bias->first;
+	auto ip = forward.input_begin();
+	auto ipe = forward.input_begin();
+	while(ip != ipe) {
+		ip >> signal;
+		energy += ip->weight->first * signal;
+		++ip;
+	}
+	
+	Neuron_base::signal_type output = 1/(1 + exp(energy));
+	
+	auto op = forward.output_begin();
+	auto ope = forward.output_end();
+	while(op != ope) {
+		op << output;
+		++op;
+	}
 }
 
 void Neuron_sigmoid::backpropagate(const unsigned int steps_back) {
 	
+	double gradient, partial = 0;
+	auto ip = backward.input_begin();
+	auto ipe = backward.input_end();
+	while(ip != ipe) {
+		ip >> partial;
+		//gather partials into gradient
+		++ip;
+	}
+	
+	double derivative; //calculate derivative of activation function
+	
+	auto op = backward.output_begin();
+	auto ope = backward.output_end();
+	while(op != ope) {
+		//output derivative to next Link (based on weight)
+		++op;
+	}
 }
 
 #endif
