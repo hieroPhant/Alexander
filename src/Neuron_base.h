@@ -22,41 +22,53 @@
 */
 
 #include <iostream>
-#include <deque>
+#include <vector>
 
 namespace alex {
 
 	class Neuron_base {
 	public:
-		typedef std::pair<double,bool> weight_type;
-		typedef double signal_type;
+		typedef double data_type;
+		typedef std::pair<data_type, bool> error_type;
+		typedef std::vector<data_type>::iterator signal_type;
+	
+	private:
+		Node<data_type, signal_type> forward; //FIELD
+		Node<error_type, data_type> backward; //FIELD
+		std::vector<data_type> state; //FIELD
+		std::vector<data_type> output; //FIELD
+	
+	protected:
+		virtual data_type f(const data_type energy) = 0;
+		virtual data_type df(const data_type energy) = 0;
+	
+	public:
 		const char neuron_type; //FIELD
+		data_type learning_rate; //FIELD
+		//data_type momentum; //FIELD to be added later
 
 		Neuron_base() = delete;
 		explicit Neuron_base(const char chNeuron_type); 
-		Neuron_base(const char chNeuron_type, const weight_type tBias);
+		Neuron_base(const char chNeuron_type, const data_type tBias);
 		Neuron_base(const char chNeuron_type,
-			    Index<weight_type, signal_type>& fIndex, 
-			    Index<double,double>& bIndex, 
-			    const weight_type tBias);
+			    Index<data_type, signal_type>& fIndex, 
+			    Index<error_type, data_type>& bIndex, 
+			    const data_type tBias);
 		Neuron_base(const Neuron_base& rhs);
 		Neuron_base(Neuron_base&& rhs);
 		Neuron_base& operator=(const Neuron_base& rhs);
 		Neuron_base& operator=(Neuron_base&& rhs) = delete;
 		virtual ~Neuron_base();
 	
-		virtual void fire() = 0;
-		virtual void backpropagate(const unsigned int steps_back=0) = 0;
+		virtual void fire();
+		virtual void backpropagate();
+		void update_weights();
 	
-		void add_input(const unsigned int address, const weight_type tWeight);
+		void prepare_steps(const unsigned int steps);
+		void add_input(const unsigned int address, const data_type tWeight);
 		void remove_input(const unsigned int address); 
 		void clear();
 		unsigned int ID() const { return forward.ID; }
-		
-	protected:
-		Node<weight_type, signal_type> forward; //FIELD
-		Node<double, signal_type> backward; //FIELD
-		std::deque<signal_type> state; //FIELD
 	}; //class Neuron_base
 
 } //namespace alex

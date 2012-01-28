@@ -27,8 +27,8 @@ namespace alex {
 
 	class NeuralNet {
 	private:
-		Index< std::pair<double,bool>, double> forward;
-		Index<double,double> backward;
+		Index< Neuron_base::data_type, Neuron_base::signal_type> forward;
+		Index<Neuron_base::error_type, Neuron_base::data_type> backward;
 		
 		std::list<Neuron_base> neurons;
 	
@@ -40,14 +40,15 @@ namespace alex {
 		NeuralNet& operator=(NeuralNet&& rhs);
 		~NeuralNet() = default;
 		
-		//unsigned int add_tanh(const double bias, const bool trainable=true);
-		//unsigned int add_tanh(const std::pair<double,bool> bias);
-		unsigned int add_sigmoid(const double bias, const bool trainable=true);
-		unsigned int add_sigmoid(const std::pair<double,bool> bias);
-		unsigned int add_linear(const double bias, const bool trainable=true);
-		unsigned int add_linear(const std::pair<double,bool> bias);
-		//unsigned int add_gaussian(const double bias, const bool trainable=true);
-		//unsigned int add_gaussian(const std::pair<double,bool> bias);
+
+		unsigned int add_sigmoid(const Neuron_base::data_type bias, 
+					const bool trainable=true);
+		unsigned int add_linear(const Neuron_base::data_type bias, 
+					const bool trainable=true);
+		unsigned int add_tanh(const Neuron_base::data_type bias, 
+				      const bool trainable=true);
+		//unsigned int add_gaussian(const Neuron_base::data_type bias, 
+		//			  const bool trainable=true);
 		
 		void connect(const unsigned int origin, 
 			     const unsigned int target,

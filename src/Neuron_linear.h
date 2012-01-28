@@ -23,56 +23,19 @@
 
 class Neuron_linear : public Neuron_base {
 public:
-	Neuron_linear(  Index<Neuron_base::weight_type, Neuron_base::signal_type>& fIndex,
-			Index<double,double>& bIndex,
-			const Neuron_base::weight_type dBias)
-		: Neuron_base("l", fIndex, bIndex, dBias) {}
+	Neuron_linear() = default;
+	Neuron_linear(Index<Neuron_base::data_type, Neuron_base::signal_type>& fIndex,
+		      Index<Neuron_base::error_type, Neuron_base::data_type>& bIndex,
+		      const Neuron_base::data_type dBias, const bool bTrainable)
+		: Neuron_base("l", fIndex, bIndex, dBias, bTrainable) {} 
 	Neuron_linear(const Neuron_linear& rhs) = default;
-	void fire();
-	void backpropagate(const unsigned int steps_back=0);
+	Neuron_linear& operator=(const Neuron_linear& rhs) = default;
+	~Neuron_linear() = default;
+	
+	Neuron_base::data_type f(const Neuron_base::data_type energy) const
+		{ return energy; }
+	Neuron_base::data_type df(const Neuron_base::data_type energy) const
+		{ return 1.0; }
 };
-
-//////////////////////////////////////////////
-//////////////////////////////////////////////
-
-void Neuron_linear::fire() { 
-	
-	Neuron_base::signal_type signal, energy = bias->first;
-	auto ip = forward.input_begin();
-	auto ipe = forward.input_begin();
-	while(ip != ipe) {
-		ip >> signal;
-		energy += ip->weight->first * signal;
-		++ip;
-	}
-	
-	auto op = forward.output_begin();
-	auto ope = forward.output_end();
-	while(op != ope) {
-		op << energy;
-		++op;
-	}
-}
-
-void Neuron_linear::backpropagate(const unsigned int steps_back) { 
-	
-	double gradient, partial = 0;
-	auto ip = backward.input_begin();
-	auto ipe = backward.input_end();
-	while(ip != ipe) {
-		ip >> partial;
-		//gather partials into gradient
-		++ip;
-	}
-	
-	double derivative; //calculate derivative of activation function
-	
-	auto op = backward.output_begin();
-	auto ope = backward.output_end();
-	while(op != ope) {
-		//output derivative to next Link (based on weight)
-		++op;
-	}
-}
 
 #endif

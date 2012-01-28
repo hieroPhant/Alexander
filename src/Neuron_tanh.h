@@ -1,7 +1,6 @@
 #ifndef Neuron_tanh_h
 #define Neuron_tanh_h
 
-#include <math>
 /*
     Alexander: a neural networks library
     Copyright (C) 2011  Jack Hall
@@ -22,60 +21,24 @@
     e-mail: jackwhall7@gmail.com
 */
 
+#include <cmath>
+
 class Neuron_tanh : public Neuron_base {
 public:
-	Neuron_tanh(Index<Neuron_base::weight_type, Neuron_base::signal_type>& fIndex,
-		    Index<double,double>& bIndex,
-			const Neuron_base::weight_type dBias)
-		: Neuron_base("l", fIndex, bIndex, dBias) {}
+	Neuron_tanh() = default;
+	Neuron_tanh(Index<Neuron_base::data_type, Neuron_base::signal_type>& fIndex,
+		    Index<Neuron_base::error_type, Neuron_base::data_type>& bIndex,
+		    const Neuron_base::data_type dBias, const bool bTrainable)
+		: Neuron_base("s", fIndex, bIndex, dBias, bTrainable) {} 
 	Neuron_tanh(const Neuron_tanh& rhs) = default;
-	void fire();
-	void backpropagate(const unsigned int steps_back=0);
+	Neuron_tanh& operator=(const Neuron_tanh& rhs) = default;
+	~Neuron_tanh() = default;
+	
+	Neuron_base::data_type f(const Neuron_base::data_type energy) const
+		{ return tanh(energy); }
+	Neuron_base::data_type df(const Neuron_base::data_type energy) const
+		{ auto x = cosh(energy);
+		  return 1/(x*x); }
 };
-
-//////////////////////////////////////////////
-//////////////////////////////////////////////
-
-void Neuron_tanh::fire() { 
-	
-	signal_type signal, energy = bias->first;
-	auto ip = forward.input_begin();
-	auto ipe = forward.input_begin();
-	while(ip != ipe) {
-		ip >> signal;
-		energy += ip->weight->first * signal;
-		++ip;
-	}
-	
-	Neuron_base::signal_type output = tanh(energy);
-	
-	auto op = forward.output_begin();
-	auto ope = forward.output_end();
-	while(op != ope) {
-		op << output;
-		++op;
-	}
-}
-
-void Neuron_tanh::backpropagate(const unsigned int steps_back) { 
-	
-	double gradient, partial = 0;
-	auto ip = backward.input_begin();
-	auto ipe = backward.input_end();
-	while(ip != ipe) {
-		ip >> partial;
-		//gather partials into gradient
-		++ip;
-	}
-	
-	double derivative; //calculate derivative of activation function
-	
-	auto op = backward.output_begin();
-	auto ope = backward.output_end();
-	while(op != ope) {
-		//output derivative to next Link (based on weight)
-		++op;
-	}
-}
 
 #endif
