@@ -3,7 +3,7 @@
 
 /*
     Alexander: a neural networks library
-    Copyright (C) 2011  Jack Hall
+    Copyright (C) 2011-2012  Jack Hall
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@ namespace alex {
 
 	class NeuralNet {
 	private:
-		Index< Neuron_base::data_type, Neuron_base::signal_type> forward;
-		Index<Neuron_base::error_type, Neuron_base::data_type> backward;
+		ben::Index< Neuron_base::data_type, Neuron_base::signal_type> forward;
+		ben::Index<Neuron_base::error_type, Neuron_base::data_type> backward;
 		
 		std::list<Neuron_base> neurons;
 	
@@ -42,7 +42,7 @@ namespace alex {
 		
 
 		unsigned int add_sigmoid(const Neuron_base::data_type bias, 
-					const bool trainable=true);
+					 const bool trainable=true);
 		unsigned int add_linear(const Neuron_base::data_type bias, 
 					const bool trainable=true);
 		unsigned int add_tanh(const Neuron_base::data_type bias, 
@@ -54,9 +54,6 @@ namespace alex {
 			     const unsigned int target,
 			     const double weight,
 			     const bool trainable=true);
-		void connect(const unsigned int origin,
-			     const unsigned int target,
-			     const std::pair<double, bool> weight)
 		
 		void run();
 		void train();

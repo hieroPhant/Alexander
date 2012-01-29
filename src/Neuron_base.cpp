@@ -1,6 +1,6 @@
 /*
     Alexander: a neural networks library
-    Copyright (C) 2011  Jack Hall
+    Copyright (C) 2011-2012  Jack Hall
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -67,6 +67,11 @@ namespace alex {
 	} 
 	
 	Neuron_base::~Neuron_base() {}
+	
+	bool Neuron_base::operator<(const Neuron_base& rhs) const {
+		if(layer == rhs.layer) return ID() < rhs.ID();
+		else return layer < rhs.layer;
+	}
 	
 	void Neuron_base::fire() {
 		signal_type signal; 
@@ -145,9 +150,10 @@ namespace alex {
 	}
 	
 	void Neuron_base::add_input(const unsigned int address, 
-				    Neuron_base::weight_type tWeight) {
-		forward.add_input(address, tWeight);
-		backward.add_output(address, tWeight); 
+				    const Neuron_base::weight_type weight,
+				    const bool trainable) {
+		forward.add_input(address, weight);
+		backward.add_output(address, std::make_pair(0.0, trainable)); 
 	}
 	
 	void Neuron_base::remove_input(const unsigned int address) {
@@ -159,6 +165,10 @@ namespace alex {
 		forward.clear();
 		backward.clear();
 		state.clear();
+	}
+	
+	void Neuron_base::shift_layer(const unsigned int new_layer) {
+		layer = new_layer; //need to shift layers of outputs
 	}
 		
 } //namespace alex

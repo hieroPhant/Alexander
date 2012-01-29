@@ -1,6 +1,6 @@
 /*
     Alexander: a neural networks library
-    Copyright (C) 2011  Jack Hall
+    Copyright (C) 2011-2012  Jack Hall
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -103,25 +103,27 @@ namespace alex {
 	//	return neurons.back().ID();
 	//}
 	
-	void NeuralNet::connect(const unsigned int origin,
-				const unsigned int target,
-				const std::pair<double, bool> weight) {
-		auto it = neurons.begin();
-		auto ite = neurons.end();
-		while(it != ite) {
-			if(it->ID() == target) {
-				it->add_input(origin, weight);
-				return;
-			}
-			++it;
-		}
-	}
-	
 	void NeuralNet::connect(const unsigned int origin, 
 				const unsigned int target,
 				const double weight,
 				const bool trainable=true) {
-		connect(origin, target, std::make_pair(weight, trainable));	
+		auto it = neurons.begin();
+		auto ite = neurons.end();
+		auto itt = it;
+		unsigned int origin_layer = 0;
+		while(it != ite) {
+			if(it->ID() == origin) origin_layer = it->layer();
+			else if(it->ID() == target) {
+				it->add_input(origin, weight, trainable);
+				itt = it;
+			}
+			
+			if(done && origin_layer != 0) break;
+			++it;
+		}
+		itt->shift_layer(origin_layer+1);
+		neurons.sort();
+		return;
 	}
 		
 	void NeuralNet::run() {
