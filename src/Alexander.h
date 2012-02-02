@@ -22,6 +22,16 @@
 */
 
 #include "Benoit.h"
+
+namespace alex {
+	typedef float data_type; //weight and signal of forward links
+	typedef float gradient_type; //signal of backprop links
+	typedef std::pair<float,bool> delta_type; //weight of backprop links
+	typedef float info_type;
+	typedef std::pair<float,bool> pdf_type;
+	
+} //namespace alex
+
 #include "Neuron_base.h"
 #include "NeuralNet.h"
 

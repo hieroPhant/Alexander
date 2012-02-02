@@ -1,5 +1,5 @@
-#ifndef NeuralNet_h
-#define NeuralNet_h
+#ifndef Organism_h
+#define Organism_h
 
 /*
     Alexander: a neural networks library
@@ -24,29 +24,41 @@
 #include <list>
 
 namespace alex {
-
-	class NeuralNet {
+	
+	class Organism {
+	public:
+		typedef ben::Index<data_type, data_type> forward_type;
+		typedef ben::Index<delta_type, gradient_type> backprop_type;
+		typedef ben::Index<pdf_type, info_type> information_type;
+	
 	private:
-		ben::Index< Neuron_base::data_type, Neuron_base::signal_type> forward;
-		ben::Index<Neuron_base::error_type, Neuron_base::data_type> backward;
+		//Indicies
+		forward_type forward;
+		backward_type backprop; //reverse of forward
+		information_type information; //full set of possible connections
 		
-		std::list<Neuron_base> neurons;
+		//cells
+		std::list<Neuron_base> inputs;
+		std::list<Ganglion> cells;
+		std::list<Neuron_base> outputs;
 	
 	public:
-		NeuralNet() = default;
-		NeuralNet(const NeuralNet& rhs);
-		NeuralNet(NeuralNet&& rhs);
-		NeuralNet& operator=(const NeuralNet& rhs);
-		NeuralNet& operator=(NeuralNet&& rhs);
-		~NeuralNet() = default;
+		Organism() = default;
+		Organism(const Organism& rhs);
+		Organism(Organism&& rhs);
+		Organism& operator=(const Organism& rhs);
+		Organism& operator=(Organism&& rhs);
+		~Organism() = default;
 		
-
-		unsigned int add_sigmoid(const Neuron_base::data_type bias, 
-					 const bool trainable=true);
-		unsigned int add_linear(const Neuron_base::data_type bias, 
-					const bool trainable=true);
-		unsigned int add_tanh(const Neuron_base::data_type bias, 
-				      const bool trainable=true);
+		unsigned int add_ganglion(const unsigned int layer);
+		unsigned int add_input();
+		unsigned int add_output();
+		//unsigned int add_sigmoid(const data_type bias, 
+		//			 const bool trainable=true);
+		//unsigned int add_linear(const data_type bias, 
+		//			const bool trainable=true);
+		//unsigned int add_tanh(const data_type bias, 
+		//		      const bool trainable=true);
 		//unsigned int add_gaussian(const Neuron_base::data_type bias, 
 		//			  const bool trainable=true);
 		
@@ -57,7 +69,7 @@ namespace alex {
 		
 		void run();
 		void train();
-	}; //class NeuralNet
+	}; //class Organism
 	
 } //namespace alex
 
