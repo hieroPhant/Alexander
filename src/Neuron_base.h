@@ -22,40 +22,36 @@
 */
 
 #include <iostream>
-#include <vector>
 
 namespace alex {
 
 	class Neuron_base {
-	public:
-		typedef double data_type;
-		typedef std::pair<data_type, bool> error_type;
-		typedef std::vector<data_type>::iterator signal_type;
-	
-	private:
-		ben::Node<data_type, signal_type> forward; //FIELD
-		ben::Node<error_type, data_type> backward; //FIELD
-		std::vector<data_type> state; //FIELD
-		std::vector<data_type> output; //FIELD
-		unsigned int layer;
-	
 	protected:
-		virtual data_type f(const data_type energy) = 0;
-		virtual data_type df(const data_type energy) = 0;
+		forward_node_type   forward_node; //FIELD
+		backprop_node_type  backprop_node; //FIELD
+	
+		data_type  state; //FIELD
+		data_type  output; //FIELD
+	
+		virtual data_type f() = 0;
+		virtual data_type df() = 0;
 	
 	public:
-		const char neuron_type; //FIELD
-		data_type learning_rate; //FIELD
-		//data_type momentum; //FIELD to be added later
-		bool operator<(const Neuron_base& rhs) const;
+		const char neuron_kind; //FIELD
+		data_type  learning_rate; //FIELD
+		data_type  momentum; //FIELD
+		virtual bool operator<(const Neuron_base& rhs) const;
 
 		Neuron_base() = delete;
-		explicit Neuron_base(const char chNeuron_type); 
-		Neuron_base(const char chNeuron_type, const data_type tBias);
-		Neuron_base(const char chNeuron_type,
-			    ben::Index<data_type, signal_type>& fIndex, 
-			    ben::Index<error_type, data_type>& bIndex, 
-			    const data_type tBias);
+		explicit Neuron_base(const char chNeuron_kind); 
+		Neuron_base(const char chNeuron_kind, 
+			    const data_type tBias, 
+			    const bool bTrainable);
+		Neuron_base(const char chNeuron_kind,
+			    forward_index_type&   fIndex, 
+			    backprop_index_type&  bIndex, 
+			    const data_type tBias
+			    const bool bTrainable=true);
 		Neuron_base(const Neuron_base& rhs);
 		Neuron_base(Neuron_base&& rhs);
 		Neuron_base& operator=(const Neuron_base& rhs);
@@ -65,15 +61,12 @@ namespace alex {
 		virtual void fire();
 		virtual void backpropagate();
 		void update_weights();
-	
-		void prepare_steps(const unsigned int steps);
+
 		void add_input(	const unsigned int address, const data_type weight, 
 				const bool trainable);
 		void remove_input(const unsigned int address); 
 		void clear();
 		unsigned int ID() const { return forward.ID; }
-		unsigned int layer() const { return layer; }
-		void shift_layer(const unsigned int new_layer);
 	}; //class Neuron_base
 
 } //namespace alex

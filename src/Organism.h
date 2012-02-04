@@ -26,16 +26,11 @@
 namespace alex {
 	
 	class Organism {
-	public:
-		typedef ben::Index<data_type, data_type> forward_type;
-		typedef ben::Index<delta_type, gradient_type> backprop_type;
-		typedef ben::Index<pdf_type, info_type> information_type;
-	
 	private:
 		//Indicies
-		forward_type forward;
-		backward_type backprop; //reverse of forward
-		information_type information; //full set of possible connections
+		ben::Index<data_type, data_type> forward;
+		ben::Index<delta_type, gradient_type> backprop; //reverse of forward
+		ben::Index<pdf_type, info_type> information; //full set of possible connections
 		
 		//cells
 		std::list<Neuron_base> inputs;

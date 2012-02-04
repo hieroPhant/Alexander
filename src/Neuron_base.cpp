@@ -31,36 +31,41 @@ namespace alex {
 	//typedef std::deque<data_type>::iterator signal_type;
 	
 	Neuron_base::Neuron_base(const char chNeuron_type) 
-		: forward(0.0), backward( std::make_pair(0.0, true), forward.ID ),
+		: forward_node(0.0), 
+		  backprop_node( std::make_pair(0.0, true), forward_node.ID ),
 		  neuron_type(chNeuron_type), learning_rate(0.0) {} 
 	
 	Neuron_base::Neuron_base(const char chNeuron_type, 
-				 const Neuron_base::data_type tBias,
-				 const bool bTrainable=true)
-		: forward(tBias), backward( std::make_pair(0.0, bTrainable), forward.ID ), 
+				 const data_type tBias,
+				 const bool bTrainable)
+		: forward_node(tBias),
+		  backprop_node( std::make_pair(0.0, bTrainable), forward_node.ID ), 
 		  neuron_type(chNeuron_type), learning_rate(0.0) {}
 	
 	Neuron_base::Neuron_base(const char chNeuron_type,
-				 Index<Neuron_base::data_type, Neuron_base::signal_type>& fIndex,
-				 Index<Neuron_base::error_type, Neuron_base::data_type>& bIndex,
-				 const Neuron_base::data_type tBias, const bool bTrainable=true) 
-		: forward(fIndex, tBias), 
-		  backward(bIndex, std::make_pair(0.0, bTrainable), forward.ID), 
+				 forward_node_index_type&   fIndex,
+				 backprop_index_type&  bIndex,
+				 const data_type tBias, 
+				 const bool bTrainable) 
+		: forward_node(fIndex, tBias), 
+		  backprop_node(bIndex, std::make_pair(0.0, bTrainable), forward_node.ID), 
 		  neuron_type(chNeuron_type), learning_rate(0.0) {}
 	
 	Neuron_base::Neuron_base(const Neuron_base& rhs) 
-		: forward(rhs.forward), backward(rhs.backward, forward.ID), state(rhs.state), 
+		: forward_node(rhs.forward_node), 
+		  backprop_node(rhs.backprop_node, forward_node.ID), state(rhs.state), 
 		  output(rhs.output), neuron_type(rhs.neuron_type), 
 		  learning_rate(rhs.learning_rate) {} //copy constructor
 	
 	Neuron_base::Neuron_base(Neuron_base&& rhs) 
-		: forward( std::move(rhs.forward) ), backward( std::move(rhs.backward) ),
+		: forward_node( std::move(rhs.forward_node) ), 
+		  backprop_node( std::move(rhs.backprop_node) ),
 		  state( std::move(rhs.state) ), output( std::move(rhs.output) ),
 		  learning_rate(rhs.learning_rate) {} //move ctor
 		  
 	Neuron_base::Neuron_base& operator=(const Neuron_base& rhs) { 
-		forward = rhs.forward;
-		backward = rhs.backward;
+		forward_node = rhs.forward_node;
+		backprop_node = rhs.backprop_node;
 		state = rhs.state; 
 		output = rhs.output;
 		learning_rate = rhs.learning_rate;
@@ -69,56 +74,50 @@ namespace alex {
 	Neuron_base::~Neuron_base() {}
 	
 	bool Neuron_base::operator<(const Neuron_base& rhs) const {
-		if(layer == rhs.layer) return ID() < rhs.ID();
-		else return layer < rhs.layer;
+		return ID() < rhs.ID();
 	}
 	
-	void Neuron_base::fire() {
+	void Neuron_base::fire() { //update ben::Link behavior
 		signal_type signal; 
-		data_type energy = forward.bias;
-		auto ip = forward.input_begin();
-		auto ipe = forward.input_begin();
+		state = forward_node.bias;
+		auto ip = forward_node.input_begin();
+		auto ipe = forward_node.input_begin();
 		while(ip != ipe) {
 			ip >> signal;
-			energy += ip->weight * (*signal);
+			state += ip->weight * signal;
 			++ip;
 		}
 		
-		if( state.capacity() == state.size() ) 
-			std::cerr << "Overran neuron buffer" << std::endl;
-		state.push_back(energy);
-		output.push_back( f(energy) );
+		output = f(state);
 	
-		auto op = forward.output_begin();
-		auto ope = forward.output_end();
+		auto op = forward_node.output_begin();
+		auto ope = forward_node.output_end();
 		while(op != ope) {
-			op << output.begin();
+			op << output;
 			++op;
 		}
 	}
 	
-	void Neuron_base::backpropagate() {
-		data_type gradient, partial = 0; 
-		data_type past_output = output.back(), past_energy = state.back();
-		output.pop_back();
-		state.pop_back();
+	void Neuron_base::backpropagate() { //update ben::Link behavior
+		gradient_type gradient=0, partial=0; 
 		
-		auto ip = backward.input_begin();
-		auto ipe = backward.input_end();
-		auto fp = forward.output_begin();
+		auto ip = backprop_node.input_begin();
+		auto ipe = backprop_node.input_end();
+		auto fp = forward_node.output_begin();
 		while(ip != ipe) {
 			ip >> partial;
-			ip->weight->first += partial * past_output; //past gradients
+			ip->weight->first += partial * output; //output links
 			gradient += partial * fp->weight;
 			++ip;
 			++fp;
 		}
 	
-		double derivative = df( past_energy ) * gradient; 
-		backward.bias->first += derivative;
+		gradient_type derivative = df(energy) * gradient; 
+		backprop_node.bias->first = -learning_rate*derivative 
+					    + momentum*backprop_node.bias->first;
 	
-		auto op = backward.output_begin();
-		auto ope = backward.output_end();
+		auto op = backprop_node.output_begin();
+		auto ope = backprop_node.output_end();
 		while(op != ope) {
 			op << derivative;
 			++op;
@@ -126,14 +125,14 @@ namespace alex {
 	}
 	
 	void Neuron_base::update_weights() {
-		if(backward.bias->second) {
-			forward.bias += learning_rate * backward.bias->first;
-			backward.bias->first = 0.0;	
+		if(backprop_node.bias->second) {
+			forward_node.bias += backprop_node.bias->first;
+			backprop_node.bias->first = 0.0;	
 		}
 	
-		auto fp = forward.input_begin();
-		auto fpe = forward.input_end();
-		auto bp = backward.output_begin();
+		auto fp = forward_node.input_begin();
+		auto fpe = forward_node.input_end();
+		auto bp = backprop_node.output_begin();
 		while(fp != fpe) {
 			if(bp->weight->second) {
 				fp->weight += learning_rate * bp->weight->first;
@@ -144,31 +143,22 @@ namespace alex {
 		}
 	}
 	
-	void Neuron_base::prepare_steps(const unsigned int steps) {
-		state.reserve(steps);
-		output.reserve(steps);
-	}
-	
 	void Neuron_base::add_input(const unsigned int address, 
-				    const Neuron_base::weight_type weight,
+				    const data_type weight,
 				    const bool trainable) {
-		forward.add_input(address, weight);
-		backward.add_output(address, std::make_pair(0.0, trainable)); 
+		forward_node.add_input(address, weight);
+		backprop_node.add_output(address, std::make_pair(0.0, trainable)); 
 	}
 	
 	void Neuron_base::remove_input(const unsigned int address) {
-		forward.remove_input(address);
-		backward.remove_output(address); 
+		forward_node.remove_input(address);
+		backprop_node.remove_output(address); 
 	}
 	
 	void Neuron_base::clear() {
-		forward.clear();
-		backward.clear();
+		forward_node.clear();
+		backprop_node.clear();
 		state.clear();
-	}
-	
-	void Neuron_base::shift_layer(const unsigned int new_layer) {
-		layer = new_layer; //need to shift layers of outputs
 	}
 		
 } //namespace alex
