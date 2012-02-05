@@ -43,7 +43,7 @@ namespace alex {
 	
 	//self-organizing map lateral connections
 	typedef float 					activity_type;
-	typedef std::pair<activity_type, Neuron*> 	link_type;
+	typedef std::pair<activity_type, SOM_Neuron*> 	link_type;
 	typedef ben::Node<link_type, activity_type> 	lateral_node_type;
 	typedef ben::Index<link_type, activity_type> 	lateral_index_type;
 	
@@ -57,3 +57,4 @@ namespace alex {
 #include "Ganglion.h"
 
 #endif
+

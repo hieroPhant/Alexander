@@ -22,6 +22,7 @@
 */
 
 #include <list>
+#include <vector>
 
 namespace alex {
 	
@@ -40,15 +41,13 @@ namespace alex {
 		
 		vector<Input_Neuron> inputs;
 		list<SOM_Neuron> neurons;
-		vector<Input_Neuron> outputs;
+		Output_Neuron output;
+		vector<unsigned int> activated_neurons;
 		//neighborhood function needed
 		//could depend on: 	sharpness of sigmoid (magnitude of weights)
 		//			information transmitted by Ganglion 
 		//			maturity of Ganglion (general magnitude of errors)
 		//			discrepancy between neighbors
-		
-		//bias and weights needed to gather signals for output? probably
-		//weights needed for incoming data? probably not
 		
 		//need functions to describe tendency of SOM_Neurons to divide/die
 		
@@ -56,18 +55,20 @@ namespace alex {
 		
 	public:		
 		Ganglion() = delete;
-		Ganglion(Organism::forward_type& Iforward,
-			 Organism::backprop_type& Ibackprop,
-			 Organism::information_type& Iinformation);
+		Ganglion(forward_index_type& fIndex,
+			 backprop_index_type& bIndex,
+			 info_index_type& iIndex);
 		Ganglion(const Ganglion& rhs) = delete;
 		Ganglion& operator=(const Ganglion& rhs) = delete;
 		~Ganglion() = default;
 		
-		//find peak of activity and evaluate that neuron+neighbors
-		void run();
+		void add_input(	const unsigned int address, const data_type weight, 
+				const bool trainable=true); 
+		void remove_input(const unsigned int address); 
+		unsigned int ID() const { return forward_node.ID; }
 		
-		//only train activated neurons+neighbors
-		void backpropagate();
+		void run(); //find peak of activity and evaluate that neuron+neighbors
+		void backpropagate(); //only train activated neurons+neighbors
 		
 	}; //class Ganglion
 

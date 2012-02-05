@@ -35,6 +35,11 @@ namespace alex {
 	
 		virtual data_type f() = 0;
 		virtual data_type df() = 0;
+		
+		void collect_signals();
+		void distribute_signals();
+		gradient_type collect_errors();
+		void distribute_errors(const gradient_type gradient);
 	
 	public:
 		const char neuron_kind; //FIELD
@@ -46,7 +51,10 @@ namespace alex {
 		explicit Neuron_base(const char chNeuron_kind); 
 		Neuron_base(const char chNeuron_kind, 
 			    const data_type tBias, 
-			    const bool bTrainable);
+			    const bool bTrainable=true);
+		Neuron_base(const char chNeuron_kind,
+			    forward_index_type&   fIndex, 
+			    backprop_index_type&  bIndex);
 		Neuron_base(const char chNeuron_kind,
 			    forward_index_type&   fIndex, 
 			    backprop_index_type&  bIndex, 
@@ -54,7 +62,7 @@ namespace alex {
 			    const bool bTrainable=true);
 		Neuron_base(const Neuron_base& rhs);
 		Neuron_base(Neuron_base&& rhs);
-		Neuron_base& operator=(const Neuron_base& rhs);
+		Neuron_base& operator=(const Neuron_base& rhs); //allow this?
 		Neuron_base& operator=(Neuron_base&& rhs) = delete;
 		virtual ~Neuron_base();
 	
@@ -63,7 +71,7 @@ namespace alex {
 		void update_weights();
 
 		void add_input(	const unsigned int address, const data_type weight, 
-				const bool trainable);
+				const bool trainable=true);
 		void remove_input(const unsigned int address); 
 		void clear();
 		unsigned int ID() const { return forward.ID; }

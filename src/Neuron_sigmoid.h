@@ -26,9 +26,9 @@
 class Neuron_sigmoid : public Neuron_base {
 public:
 	Neuron_sigmoid() = default;
-	Neuron_sigmoid(Index<Neuron_base::data_type, Neuron_base::signal_type>& fIndex,
-		       Index<Neuron_base::error_type, Neuron_base::data_type>& bIndex,
-		       const Neuron_base::data_type dBias, const bool bTrainable)
+	Neuron_sigmoid(forward_index_type& fIndex,
+		       backprop_index_type& bIndex,
+		       const data_type dBias, const bool bTrainable=true)
 		: Neuron_base("s", fIndex, bIndex, dBias, bTrainable) {} 
 	Neuron_sigmoid(const Neuron_sigmoid& rhs) = default;
 	Neuron_sigmoid& operator=(const Neuron_sigmoid& rhs) = default;

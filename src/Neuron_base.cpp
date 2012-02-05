@@ -26,35 +26,38 @@
 
 namespace alex {
 	
-	//typedef double data_type;
-	//typedef std::pair<data_type, bool> weight_type;
-	//typedef std::deque<data_type>::iterator signal_type;
-	
-	Neuron_base::Neuron_base(const char chNeuron_type) 
+	Neuron_base::Neuron_base(const char chNeuron_kind) 
 		: forward_node(0.0), 
 		  backprop_node( std::make_pair(0.0, true), forward_node.ID ),
-		  neuron_type(chNeuron_type), learning_rate(0.0) {} 
+		  neuron_kind(chNeuron_kind), learning_rate(0.0) {} 
 	
-	Neuron_base::Neuron_base(const char chNeuron_type, 
+	Neuron_base::Neuron_base(const char chNeuron_kind, 
 				 const data_type tBias,
 				 const bool bTrainable)
 		: forward_node(tBias),
 		  backprop_node( std::make_pair(0.0, bTrainable), forward_node.ID ), 
-		  neuron_type(chNeuron_type), learning_rate(0.0) {}
+		  neuron_kind(chNeuron_kind), learning_rate(0.0) {}
 	
-	Neuron_base::Neuron_base(const char chNeuron_type,
+	Neuron_base::Neuron_base(const char chNeuron_kind,
+				 forward_index_type&   fIndex, 
+				 backprop_index_type&  bIndex) 
+		: forward_node(fIndex),
+		  backprop_node(bIndex, std::make_pair(0.0, bTrainable), forward_node.ID),
+		  neuron_kind(chNeuron_kind) {}
+	
+	Neuron_base::Neuron_base(const char chNeuron_kind,
 				 forward_node_index_type&   fIndex,
 				 backprop_index_type&  bIndex,
 				 const data_type tBias, 
 				 const bool bTrainable) 
 		: forward_node(fIndex, tBias), 
 		  backprop_node(bIndex, std::make_pair(0.0, bTrainable), forward_node.ID), 
-		  neuron_type(chNeuron_type), learning_rate(0.0) {}
+		  neuron_kind(chNeuron_kind), learning_rate(0.0) {}
 	
 	Neuron_base::Neuron_base(const Neuron_base& rhs) 
 		: forward_node(rhs.forward_node), 
 		  backprop_node(rhs.backprop_node, forward_node.ID), state(rhs.state), 
-		  output(rhs.output), neuron_type(rhs.neuron_type), 
+		  output(rhs.output), neuron_kind(rhs.neuron_kind), 
 		  learning_rate(rhs.learning_rate) {} //copy constructor
 	
 	Neuron_base::Neuron_base(Neuron_base&& rhs) 
@@ -77,8 +80,14 @@ namespace alex {
 		return ID() < rhs.ID();
 	}
 	
-	void Neuron_base::fire() { //update ben::Link behavior
-		signal_type signal; 
+	void Neuron_base::fire() { 
+		collect_signals();
+		output = f(state);
+		distribute_signals();
+	}
+	
+	void Neuron_base::collect_signals() {
+		data_type signal; 
 		state = forward_node.bias;
 		auto ip = forward_node.input_begin();
 		auto ipe = forward_node.input_begin();
@@ -87,9 +96,9 @@ namespace alex {
 			state += ip->weight * signal;
 			++ip;
 		}
-		
-		output = f(state);
+	}
 	
+	void Neuron_base::distribute_signals() {
 		auto op = forward_node.output_begin();
 		auto ope = forward_node.output_end();
 		while(op != ope) {
@@ -98,28 +107,38 @@ namespace alex {
 		}
 	}
 	
-	void Neuron_base::backpropagate() { //update ben::Link behavior
-		gradient_type gradient=0, partial=0; 
-		
-		auto ip = backprop_node.input_begin();
-		auto ipe = backprop_node.input_end();
-		auto fp = forward_node.output_begin();
-		while(ip != ipe) {
-			ip >> partial;
-			ip->weight->first += partial * output; //output links
-			gradient += partial * fp->weight;
-			++ip;
-			++fp;
-		}
+	void Neuron_base::backpropagate() { 
+		gradient_type gradient = collect_errors();
 	
 		gradient_type derivative = df(energy) * gradient; 
-		backprop_node.bias->first = -learning_rate*derivative 
-					    + momentum*backprop_node.bias->first;
+		backprop_node.bias->first = -learning_rate * derivative 
+					    + momentum * backprop_node.bias->first;
 	
-		auto op = backprop_node.output_begin();
+		distribute_errors(derivative);
+	}
+	
+	gradient_type Neuron_base::collect_errors() {
+		gradient_type gradient=0, partial; 
+		auto ip = backprop_node.input_begin();
+		auto ipe = backprop_node.input_end();
+		while(ip != ipe) {
+			ip >> partial;
+			gradient += partial; //multiplied by weight at gradient source
+			++ip;
+		}
+		return gradient;
+	}
+	
+	void Neuron_base::distribute_errors(const gradient_type gradient) {
+		auto op = backprop_node.output_begin(); //same as second half of Neuron_base vn
 		auto ope = backprop_node.output_end();
+		auto fp = forward_node.input_begin();
+		data_type old_output;
 		while(op != ope) {
-			op << derivative;
+			fp >> old_output; //depends on Link saving old values
+			op->weight->first = -learning_rate * gradient * old_output
+					    + momentum * op->weight->first;
+			op << gradient * fp->weight;
 			++op;
 		}
 	}

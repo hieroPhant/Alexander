@@ -22,14 +22,32 @@
 */
 
 namespace alex {
-
+	
+	class Ganglion; 
+	
 	class SOM_Neuron : public Neuron_sigmoid {
 	private:
 		lateral_node_type  lateral_node;
 		
+		activity_type width;
 		vector<activity_type> locus; //get Benito's advice on SOMs
+		
 	public:
-	
+		SOM_Neuron() = delete;
+		explicit SOM_Neuron(const Ganglion* parent);
+		SOM_Neuron(const Ganglion* parent,
+			   vector<activity_type>& vLocus);
+		SOM_Neuron(const SOM_Neuron& rhs);
+		SOM_Neuron(SOM_Neuron&& rhs);
+		SOM_Neuron& operator=(const SOM_Neuron& rhs);
+		SOM_Neuron& operator=(SOM_Neuron&& rhs) = delete;
+		~SOM_Neuron() = default;
+		
+		void get_neighbors(vector<unsigned int>& neighbors) const;
+		activity_type select();
+		void fire();
+		void backpropagate();
+		
 	}; //class SOM_Neuron
 
 } //namespace alex
