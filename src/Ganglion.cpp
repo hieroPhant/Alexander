@@ -32,6 +32,10 @@ namespace alex {
 		  //add first SOM_Neuron
 	}
 	
+	void connect_cell(const unsigned int address) {
+		
+	}
+	
 	void Ganglion::add_input(const unsigned int address, const data_type weight, 
 				 const bool trainable=true) {
 				 

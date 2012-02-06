@@ -22,31 +22,33 @@
 
 namespace alex {
 
-	SOM_Neuron::SOM_Neuron(const Ganglion* parent)
+	SOM_Neuron::SOM_Neuron(Ganglion& parent)
 		: Neuron_sigmoid(parent->forward_index, parent->backprop_index, 0.0), 
-		  lateral_node(lIndex, ID()) {
-		//connect to rest of Ganglion
+		  lateral_node(lIndex, ID()), width(1.0) {
+		initialize(parent);
 	}
 	
-	SOM_Neuron::SOM_Neuron( const Ganglion* parent,
+	SOM_Neuron::SOM_Neuron( Ganglion& parent,
 				vector<activity_type>& vLocus)
-		: {
-		//connect to rest of Ganglion
+		: Neuron_sigmoid(parent->forward_index, parent->backprop_index, 0.0), 
+		  lateral_node(parent->information_index, ID()), locus(vLocus), width(1.0) {
+		initialize(parent);
 	}
 	
 	SOM_Neuron::SOM_Neuron(const SOM_Neuron& rhs) 
-		: {
-		//connect to rest of Ganglion
+		: Neuron_sigmoid(rhs), lateral_node(rhs.lateral_node), locus(rhs.locus), 
+		  width(rhs.width) {
+		//how to initialize without parent reference?
 	}
 	
 	SOM_Neuron::SOM_Neuron(SOM_Neuron&& rhs) 
-		: {
+		: Neuron_sigmoid(std::move(rhs)), lateral_node(std::move(rhs.lateral_node)), 
+		  locus(std::move(rhs.locus)), width(rhs.width) {}
 	
-	}
-	
-	SOM_Neuron::SOM_Neuron& operator=(const SOM_Neuron& rhs) {
-	
-	}
+	void SOM_Neuron::initialize(Ganglion& parent) {
+		parent.connect_cell( ID() );
+		//initialize neighborhood and weights here?
+	} 
 	
 	activity_type SOM_Neuron::select() {
 		//pull in signals

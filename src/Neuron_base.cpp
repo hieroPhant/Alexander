@@ -26,39 +26,19 @@
 
 namespace alex {
 	
-	Neuron_base::Neuron_base(const char chNeuron_kind) 
-		: forward_node(0.0), 
-		  backprop_node( std::make_pair(0.0, true), forward_node.ID ),
-		  neuron_kind(chNeuron_kind), learning_rate(0.0) {} 
-	
-	Neuron_base::Neuron_base(const char chNeuron_kind, 
-				 const data_type tBias,
-				 const bool bTrainable)
-		: forward_node(tBias),
-		  backprop_node( std::make_pair(0.0, bTrainable), forward_node.ID ), 
-		  neuron_kind(chNeuron_kind), learning_rate(0.0) {}
-	
-	Neuron_base::Neuron_base(const char chNeuron_kind,
-				 forward_index_type&   fIndex, 
-				 backprop_index_type&  bIndex) 
-		: forward_node(fIndex),
-		  backprop_node(bIndex, std::make_pair(0.0, bTrainable), forward_node.ID),
-		  neuron_kind(chNeuron_kind) {}
-	
-	Neuron_base::Neuron_base(const char chNeuron_kind,
-				 forward_node_index_type&   fIndex,
+	Neuron_base::Neuron_base(forward_node_index_type&   fIndex,
 				 backprop_index_type&  bIndex,
-				 const data_type tBias, 
-				 const bool bTrainable) 
-		: forward_node(fIndex, tBias), 
-		  backprop_node(bIndex, std::make_pair(0.0, bTrainable), forward_node.ID), 
-		  neuron_kind(chNeuron_kind), learning_rate(0.0) {}
+				 information_index_type& iIndex,
+				 const data_type bias, 
+				 const bool trainable) 
+		: forward_node(fIndex, bias), 
+		  backprop_node(bIndex, std::make_pair(0.0, trainable), forward_node.ID), 
+		  info_node(iIndex, forward_node.ID) {}
 	
 	Neuron_base::Neuron_base(const Neuron_base& rhs) 
 		: forward_node(rhs.forward_node), 
-		  backprop_node(rhs.backprop_node, forward_node.ID), state(rhs.state), 
-		  output(rhs.output), neuron_kind(rhs.neuron_kind), 
-		  learning_rate(rhs.learning_rate) {} //copy constructor
+		  backprop_node(rhs.backprop_node, forward_node.ID), 
+		  info_node(rhs.info_node, forward_node.ID) {} //copy constructor
 	
 	Neuron_base::Neuron_base(Neuron_base&& rhs) 
 		: forward_node( std::move(rhs.forward_node) ), 

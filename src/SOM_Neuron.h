@@ -32,10 +32,12 @@ namespace alex {
 		activity_type width;
 		vector<activity_type> locus; //get Benito's advice on SOMs
 		
+		void initialize(Ganglion& parent);
+		
 	public:
 		SOM_Neuron() = delete;
-		explicit SOM_Neuron(const Ganglion* parent);
-		SOM_Neuron(const Ganglion* parent,
+		explicit SOM_Neuron(const Ganglion& parent);
+		SOM_Neuron(const Ganglion& parent,
 			   vector<activity_type>& vLocus);
 		SOM_Neuron(const SOM_Neuron& rhs);
 		SOM_Neuron(SOM_Neuron&& rhs);

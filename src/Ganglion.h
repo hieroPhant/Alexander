@@ -53,6 +53,8 @@ namespace alex {
 		
 		//to evolve: neighborhood function, birth/death function
 		
+		void connect_cell(const unsigned int address);
+		
 	public:		
 		Ganglion() = delete;
 		Ganglion(forward_index_type& fIndex,
@@ -61,6 +63,8 @@ namespace alex {
 		Ganglion(const Ganglion& rhs) = delete;
 		Ganglion& operator=(const Ganglion& rhs) = delete;
 		~Ganglion() = default;
+		
+		friend void SOM_Neuron::initialize(Ganglion& parent);
 		
 		void add_input(	const unsigned int address, const data_type weight, 
 				const bool trainable=true); 

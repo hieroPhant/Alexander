@@ -33,9 +33,9 @@ namespace alex {
 		ben::Index<pdf_type, info_type> information; //full set of possible connections
 		
 		//cells
-		std::list<Neuron_base> inputs;
-		std::list<Ganglion> cells;
-		std::list<Neuron_base> outputs;
+		std::list<Input_Neuron> inputs;
+		std::list<Neurocyte> cells;
+		std::list<Output_Neuron> outputs;
 	
 	public:
 		Organism() = default;
@@ -45,7 +45,7 @@ namespace alex {
 		Organism& operator=(Organism&& rhs);
 		~Organism() = default;
 		
-		unsigned int add_ganglion(const unsigned int layer);
+		unsigned int add_neuron(const unsigned int layer);
 		unsigned int add_input();
 		unsigned int add_output();
 		//unsigned int add_sigmoid(const data_type bias, 
