@@ -50,11 +50,10 @@ namespace alex {
 } //namespace alex
 
 #include "Neuron_base.h"
-#include "Neuron_sigmoid.h"
-#include "SOM_Neuron.h"
+#include "Neurocyte.h" 	//forward declares class Organism
 #include "Input_Neuron.h"
 #include "Output_Neuron.h"
-#include "Ganglion.h"
+#include "Organism.h"
 
 #endif
 

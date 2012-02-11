@@ -22,6 +22,7 @@
 */
 
 #include <list>
+#include "Alexander.h"
 
 namespace alex {
 	
@@ -34,7 +35,7 @@ namespace alex {
 		
 		//cells
 		std::list<Neuron_base> inputs;
-		std::list<Ganglion> cells;
+		std::list<Neurocyte> cells;
 		std::list<Neuron_base> outputs;
 	
 	public:
@@ -48,14 +49,6 @@ namespace alex {
 		unsigned int add_ganglion(const unsigned int layer);
 		unsigned int add_input();
 		unsigned int add_output();
-		//unsigned int add_sigmoid(const data_type bias, 
-		//			 const bool trainable=true);
-		//unsigned int add_linear(const data_type bias, 
-		//			const bool trainable=true);
-		//unsigned int add_tanh(const data_type bias, 
-		//		      const bool trainable=true);
-		//unsigned int add_gaussian(const Neuron_base::data_type bias, 
-		//			  const bool trainable=true);
 		
 		void connect(const unsigned int origin, 
 			     const unsigned int target,
