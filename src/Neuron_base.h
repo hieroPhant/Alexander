@@ -48,6 +48,8 @@ namespace alex {
 		void distribute_signals(const data_type output);
 		gradient_type collect_errors();
 		void distribute_errors(const gradient_type gradient);
+		info_type collect_value();
+		void distribute_value();
 		
 		void update_weights();
 

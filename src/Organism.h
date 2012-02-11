@@ -22,6 +22,7 @@
 */
 
 #include <list>
+#include <vector>
 #include "Alexander.h"
 
 namespace alex {
@@ -34,11 +35,14 @@ namespace alex {
 		ben::Index<pdf_type, info_type> information; //full set of possible connections
 		
 		//cells
-		std::list<Neuron_base> inputs;
+		std::list<Input_Neuron> inputs;
 		std::list<Neurocyte> cells;
-		std::list<Neuron_base> outputs;
+		std::list<Output_Neuron> outputs;
 	
 	public:
+		//centralized matrix
+		std::vector< std::vector<pdf> > mutual_information; //should this have a class?
+		
 		Organism() = default;
 		Organism(const Organism& rhs);
 		Organism(Organism&& rhs);

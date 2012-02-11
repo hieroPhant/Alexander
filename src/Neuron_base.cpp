@@ -47,16 +47,16 @@ namespace alex {
 		info_node = rhs.info_node;
 	} 
 	
-	void Neuron_base::collect_signals() {
+	data_type Neuron_base::collect_signals() {
 		data_type signal, state=forward_node.bias; 
 		auto ip = forward_node.input_begin();
 		auto ipe = forward_node.input_begin();
 		while(ip != ipe) {
 			ip >> signal;
-			//add to pdf?
 			state += ip->weight * signal;
 			++ip;
 		}
+		return state;
 	}
 	
 	void Neuron_base::distribute_signals(const data_type output) {
@@ -90,6 +90,29 @@ namespace alex {
 			op->weight->first = -learning_rate * gradient * old_output
 					    + momentum * op->weight->first;
 			op << gradient * fp->weight;
+			++op;
+		}
+	}
+	
+	info_type Neuron_base::collect_value() {
+		auto ip = info_node.input_begin();
+		auto ipe = info_node.input_end();
+		info_type link_value, neuron_value = 0;
+		while(ip != ipe) {
+			op >> link_value;
+			neuron_value += link_value;
+			++ip;
+		}
+		return neuron_value;
+	}
+	
+	void Neuron_base::distribute_value() {
+		auto op = info_node.output_begin();
+		auto ope = info_node.output.end();
+		while(op != ope) {
+			if(op->weight->second) {
+				//calculate value from mutual information
+			}
 			++op;
 		}
 	}
