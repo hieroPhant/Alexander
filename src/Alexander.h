@@ -36,15 +36,17 @@ namespace alex {
 	typedef ben::Index<delta_type, gradient_type> 	backprop_index_type;
 	
 	//information-theoretic connections
-	typedef float 						info_type;
-	typedef pdf 						pdf_type; //this isn't right yet
-	typedef ben::Node<std::pair<pdf_type*,bool>, info_type> info_node_type;
-	typedef ben::Index<pdf_type, info_type> 		info_index_type;
+	typedef float 					info_type;
+	typedef float 					value_type; 
+	typedef ben::Node<value_type, info_type> 	info_node_type; 
+	typedef ben::Index<value_type, info_type> 	info_index_type;
 	
 } //namespace alex
 
+#include "PDF.h"
+#include "ValueMatrix.h"
 #include "Neuron_base.h"
-#include "Neurocyte.h" 	//forward declares class Organism
+#include "Neurocyte.h" 	//may forward declare class Organism
 #include "Input_Neuron.h"
 #include "Output_Neuron.h"
 #include "Organism.h"

@@ -40,17 +40,16 @@ namespace alex {
 		std::list<Output_Neuron> outputs;
 	
 	public:
-		//centralized matrix
-		std::vector< std::vector<pdf> > mutual_information; //should this have a class?
+		ValueMatrix mutual_information; //centralized matrix
 		
 		Organism() = default;
-		Organism(const Organism& rhs);
-		Organism(Organism&& rhs);
-		Organism& operator=(const Organism& rhs);
-		Organism& operator=(Organism&& rhs);
+		Organism(const Organism& rhs) = delete;
+		//Organism(Organism&& rhs);
+		Organism& operator=(const Organism& rhs) = delete;
+		//Organism& operator=(Organism&& rhs);
 		~Organism() = default;
 		
-		unsigned int add_ganglion(const unsigned int layer);
+		unsigned int add_neurocyte(const unsigned int layer);
 		unsigned int add_input();
 		unsigned int add_output();
 		
