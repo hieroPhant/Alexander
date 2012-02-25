@@ -22,6 +22,8 @@
 */
 
 #include <list>
+#include <vector>
+#include "Alexander.h"
 
 namespace alex {
 	
@@ -38,24 +40,18 @@ namespace alex {
 		std::list<Output_Neuron> outputs;
 	
 	public:
+		ValueMatrix mutual_information; //centralized matrix
+		
 		Organism() = default;
-		Organism(const Organism& rhs);
-		Organism(Organism&& rhs);
-		Organism& operator=(const Organism& rhs);
-		Organism& operator=(Organism&& rhs);
+		Organism(const Organism& rhs) = delete;
+		//Organism(Organism&& rhs);
+		Organism& operator=(const Organism& rhs) = delete;
+		//Organism& operator=(Organism&& rhs);
 		~Organism() = default;
 		
-		unsigned int add_neuron(const unsigned int layer);
+		unsigned int add_neurocyte(const unsigned int layer);
 		unsigned int add_input();
 		unsigned int add_output();
-		//unsigned int add_sigmoid(const data_type bias, 
-		//			 const bool trainable=true);
-		//unsigned int add_linear(const data_type bias, 
-		//			const bool trainable=true);
-		//unsigned int add_tanh(const data_type bias, 
-		//		      const bool trainable=true);
-		//unsigned int add_gaussian(const Neuron_base::data_type bias, 
-		//			  const bool trainable=true);
 		
 		void connect(const unsigned int origin, 
 			     const unsigned int target,

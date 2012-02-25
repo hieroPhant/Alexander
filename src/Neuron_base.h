@@ -40,9 +40,16 @@ namespace alex {
 			    const bool trainable=true);
 		Neuron_base(const Neuron_base& rhs);
 		Neuron_base(Neuron_base&& rhs);
-		Neuron_base& operator=(const Neuron_base& rhs); 
+		Neuron_base& operator=(const Neuron_base& rhs);
 		Neuron_base& operator=(Neuron_base&& rhs) = delete;
-		virtual ~Neuron_base();
+		virtual ~Neuron_base() = default;
+	
+		data_type collect_signals();
+		void distribute_signals(const data_type output);
+		gradient_type collect_errors();
+		void distribute_errors(const gradient_type gradient);
+		info_type collect_value();
+		void distribute_value();
 		
 		void update_weights();
 		void collect_signals();
@@ -53,6 +60,7 @@ namespace alex {
 		void add_input(	const unsigned int address, const data_type weight, 
 				const bool trainable=true);
 		void remove_input(const unsigned int address); 
+		void connect_info(const unsigned int address);
 		void clear();
 		unsigned int ID() const { return forward.ID; }
 	}; //class Neuron_base

@@ -1,6 +1,3 @@
-#ifndef SOM_Neuron_h
-#define SOM_Neuron_h
-
 /*
     Alexander: a neural networks library
     Copyright (C) 2011-2012  Jack Hall
@@ -21,37 +18,19 @@
     e-mail: jackwhall7@gmail.com
 */
 
+#include "ValueMatrix.h"
+
 namespace alex {
+
+	PDF* ValueMatrix::add(const unsigned int address);
+	void ValueMatrix::remove(const unsigned int address);
+	void ValueMatrix::add_data(const unsigned int address, const data_type data_point);
+	void ValueMatrix::update();
 	
-	class Ganglion; 
-	
-	class SOM_Neuron : public Neuron_sigmoid {
-	private:
-		lateral_node_type  lateral_node;
+	bool ValueMatrix::ready() const;
 		
-		activity_type width;
-		vector<activity_type> locus; //get Benito's advice on SOMs
-		
-		void initialize(Ganglion& parent);
-		
-	public:
-		SOM_Neuron() = delete;
-		explicit SOM_Neuron(const Ganglion& parent);
-		SOM_Neuron(const Ganglion& parent,
-			   vector<activity_type>& vLocus);
-		SOM_Neuron(const SOM_Neuron& rhs);
-		SOM_Neuron(SOM_Neuron&& rhs);
-		SOM_Neuron& operator=(const SOM_Neuron& rhs);
-		SOM_Neuron& operator=(SOM_Neuron&& rhs) = delete;
-		~SOM_Neuron() = default;
-		
-		void get_neighbors(vector<unsigned int>& neighbors) const;
-		activity_type select();
-		void fire();
-		void backpropagate();
-		
-	}; //class SOM_Neuron
+	info_type ValueMatrix::get_mutual_info(	const unsigned int address1, 
+						const unsigned int address2) const;
 
 } //namespace alex
 
-#endif

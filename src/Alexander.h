@@ -37,24 +37,19 @@ namespace alex {
 	
 	//information-theoretic connections
 	typedef float 					info_type;
-	typedef std::pair<float,bool> 			pdf_type; //this isn't right yet
-	typedef ben::Node<pdf_type, info_type> 		info_node_type;
-	typedef ben::Index<pdf_type, info_type> 	info_index_type;
-	
-	//self-organizing map lateral connections
-	typedef float 					activity_type;
-	typedef std::pair<activity_type, SOM_Neuron*> 	link_type;
-	typedef ben::Node<link_type, activity_type> 	lateral_node_type;
-	typedef ben::Index<link_type, activity_type> 	lateral_index_type;
+	typedef float 					value_type; 
+	typedef ben::Node<value_type, info_type> 	info_node_type; 
+	typedef ben::Index<value_type, info_type> 	info_index_type;
 	
 } //namespace alex
 
+#include "PDF.h"
+#include "ValueMatrix.h"
 #include "Neuron_base.h"
-#include "Neuron_sigmoid.h"
-#include "SOM_Neuron.h"
+#include "Neurocyte.h" 	//may forward declare class Organism
 #include "Input_Neuron.h"
 #include "Output_Neuron.h"
-#include "Ganglion.h"
+#include "Organism.h"
 
 #endif
 
