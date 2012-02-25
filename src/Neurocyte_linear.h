@@ -1,5 +1,5 @@
-#ifndef Output_Neuron_h
-#define Output_Neuron_h
+#ifndef Neurocyte_linear_h
+#define Neurocyte_linear_h
 
 /*
     Alexander: a neural networks library
@@ -23,31 +23,35 @@
 
 namespace alex {
 
-	class Output_Neuron : public Neuron_base {
+	class Neurocyte_linear : public Neuron_base {
 	private:
-		data_type f();
-		data_type df();
+		virtual data_type f(const data_type z) const;
+		virtual gradient_type df(const data_type z) const;
 		
 	public:
-		Output_Neuron() = delete;
-		Output_Neuron(forward_index_type& fIndex, backprop_index_type& bIndex);
-		Output_Neuron(const Output_Neuron& rhs) = default;
-		Output_Neuron(Output_Neuron&& rhs);
-		Output_Neuron& operator=(const Output_Neuron& rhs) = default;
-		Output_Neuron& operator=(Output_Neuron&& rhs) = delete;
-		~Output_Neuron() = default;
+		//constructors need work
+		Neurocyte_linear() = delete;
+		Neurocyte_linear(forward_index_type& fIndex, backprop_index_type& bIndex);
+		Neurocyte_linear(const Neurocyte_linear& rhs) = default;
+		Neurocyte_linear(Neurocyte_linear&& rhs);
+		Neurocyte_linear& operator=(const Neurocyte_linear& rhs) = default;
+		Neurocyte_linear& operator=(Neurocyte_linear&& rhs) = delete;
+		~Neurocyte_linear() = default;
 		
-		data_type take_signal()
-			{ collect_signals(); 	return state; }
-		void feed_gradient(const gradient_type gradient) 
-			{ distribute_gradients(gradient); }
-	}; //class Output_Neuron
+		virtual void act_on_topology() {}
+	}; //class Neurocyte_linear
 	
-	Output_Neuron::Output_Neuron(forward_index_type& fIndex, backprop_index_type& bIndex) 
+	Neurocyte_linear::Neurocyte_linear(forward_index_type& fIndex, backprop_index_type& bIndex) 
 		: Neuron_base("o", fIndex, bIndex, 0.0) {}
 	
-	Output_Neuron::Output_Neuron(Output_Neuron&& rhs)
+	Neurocyte_linear::Neurocyte_linear(Neurocyte_linear&& rhs)
 		: Neuron_base(std::move(rhs.Neuron_base)) {}
+	
+	data_type Neurocyte_linear::f(const data_type z) const 
+		{ return z; }
+	
+	gradient_type Neurocyte_linear::df(const data_type z) const 
+		{ return 1.0; }
 	
 } //namespace alex
 

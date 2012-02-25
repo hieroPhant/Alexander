@@ -44,11 +44,14 @@ namespace alex {
 } //namespace alex
 
 #include "PDF.h"
-#include "ValueMatrix.h"
+#include "Value.h"
+#include "Genotype.h"
+#include "Phenotype.h"
 #include "Neuron_base.h"
 #include "Neurocyte.h" 	//may forward declare class Organism
-#include "Input_Neuron.h"
-#include "Output_Neuron.h"
+#include "Neurocyte_linear.h"
+#include "Neurocyte_sigmoid.h"
+#include "InputCell.h"
 #include "Organism.h"
 
 #endif
