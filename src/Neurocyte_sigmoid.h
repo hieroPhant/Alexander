@@ -21,16 +21,18 @@
     e-mail: jackwhall7@gmail.com
 */
 #include <cmath>
+#include "Genotype.h"
+#include "Phenotype.h"
 
 namespace alex {
 
-	class Neurocyte_sigmoid : public Neuron_base {
+	class Neurocyte_sigmoid : public Neurocyte {
 	private:
 		virtual data_type f(const data_type z) const;
 		virtual gradient_type df(const data_type z) const;
 		
-		Phenotype phenotype;
 		Genotype genome;
+		Phenotype phenotype;
 		
 	public:
 		//constructors need work

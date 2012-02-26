@@ -37,18 +37,18 @@ namespace alex {
 	
 	//information-theoretic connections
 	typedef float 					info_type;
-	typedef float 					value_type; 
-	typedef ben::Node<value_type, info_type> 	info_node_type; 
-	typedef ben::Index<value_type, info_type> 	info_index_type;
+	typedef ben::Node<info_type, info_type> 	info_node_type; 
+	typedef ben::Index<info_type, info_type> 	info_index_type;
 	
 } //namespace alex
 
 #include "PDF.h"
 #include "Value.h"
-#include "Genotype.h"
+#include "Genotype.h" //forward declares class Fitness
+#include "Fitness.h"
 #include "Phenotype.h"
 #include "Neuron_base.h"
-#include "Neurocyte.h" 	//may forward declare class Organism
+#include "Neurocyte.h" 	//forward declares class Organism
 #include "Neurocyte_linear.h"
 #include "Neurocyte_sigmoid.h"
 #include "InputCell.h"

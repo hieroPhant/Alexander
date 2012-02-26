@@ -1,5 +1,5 @@
-#ifndef ValueMatrix_h
-#define ValueMatrix_h
+#ifndef Value_h
+#define Value_h
 
 /*
     Alexander: a neural networks library
@@ -24,7 +24,7 @@
 #include <map>
 
 namespace alex {
-
+	
 	struct AddressPair {
 		unsigned int one, two;
 		AddressPair() : one(0), two(0) {}
@@ -41,7 +41,7 @@ namespace alex {
 	}; //struct AddressPair
 
 
-	class ValueMatrix {
+	class Value {
 	private:
 		std::map< AddressPair, PDF<2> > joint_pdfs;
 		std::map< unsigned int, PDF<1> > single_pdfs; //different pdf_type
@@ -49,10 +49,10 @@ namespace alex {
 		std::map<unsigned int, data_type> new_data;
 		
 	public:
-		ValueMatrix() = default;
-		ValueMatrix(const ValueMatrix& rhs) = delete;
-		ValueMatrix& operator=(const ValueMatrix& rhs) = delete;
-		~ValueMatrix() = default;
+		Value() = default;
+		Value(const Value& rhs) = delete;
+		Value& operator=(const Value& rhs) = delete;
+		~Value() = default;
 		
 		PDF* add(const unsigned int address); //correct return value?
 		void remove(const unsigned int address);
@@ -64,8 +64,9 @@ namespace alex {
 		info_type get_mutual_info(const unsigned int address1, 
 					  const unsigned int address2) const;
 					  
-	}; //class ValueMatrix
+	}; //class Value
 
 } //namespace alex
 
+#endif
 

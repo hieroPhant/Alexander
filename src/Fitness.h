@@ -1,5 +1,5 @@
-#ifndef PDF_h
-#define PDF_h
+#ifndef Fitness_h
+#define Fitness_h
 
 /*
     Alexander: a neural networks library
@@ -21,22 +21,33 @@
     e-mail: jackwhall7@gmail.com
 */
 
+#include <map>
+
 namespace alex {
-	
-	template<unsigned int D> //number of dimensions
-	class PDF { 
+
+	template<unsigned int N>
+	class Fitness {
 	private:
-	
-	public:
-		PDF();
-		PDF(const PDF& rhs) = delete; //for now
-		PDF& operator=(const PDF& rhs) = delete;
-		~PDF() = default;
+		map<unsigned int, Genotype<N>*> population;
 		
-		info_type query(const data_type point); //how to write these?
-		void update(const data_type point);
-	}; //class PDF
-	
+	public:
+		Fitness() = default;
+		Fitness(const Fitness& rhs) = delete;
+		//Fitness(Fitness&& rhs);
+		Fitness& operator=(const Fitness& rhs) = delete;
+		//Fitness& operator=(Fitness&& rhs);
+		~Fitness() = default;
+		
+		unsigned int genome_length() { return N; }
+		unsigned population_size() { return population.size(); }
+		
+		bitset<N> generate();
+		bitset<N> generate(const unsigned int parent);
+		void remove(const unsigned int address);
+		void update(const unsigned int address, Genotype<N>* pGenotype);
+		
+	}; //class Fitness
+
 } //namespace alex
 
 #endif

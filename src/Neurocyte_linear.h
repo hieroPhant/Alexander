@@ -23,7 +23,7 @@
 
 namespace alex {
 
-	class Neurocyte_linear : public Neuron_base {
+	class Neurocyte_linear : public Neurocyte {
 	private:
 		virtual data_type f(const data_type z) const;
 		virtual gradient_type df(const data_type z) const;

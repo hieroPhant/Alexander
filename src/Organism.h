@@ -29,18 +29,19 @@ namespace alex {
 	
 	class Organism {
 	private:
-		//Indicies
+		//cells
+		std::list<InputCell> inputs;
+		std::list<Neurocyte> cells;
+		std::list<Neurocyte> outputs;
+	
+	public:
+		//Indicies, public for Neurocyte construction
 		ben::Index<data_type, data_type> forward;
 		ben::Index<delta_type, gradient_type> backprop; //reverse of forward
 		ben::Index<pdf_type, info_type> information; //full set of possible connections
-		
-		//cells
-		std::list<Input_Neuron> inputs;
-		std::list<Neurocyte> cells;
-		std::list<Output_Neuron> outputs;
 	
-	public:
-		ValueMatrix mutual_information; //centralized matrix
+		Value distributions; //centralized pdf and information matrix
+		Fitness fitness; //centralized evolutionary data
 		
 		Organism() = default;
 		Organism(const Organism& rhs) = delete;
