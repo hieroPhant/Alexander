@@ -48,9 +48,36 @@ namespace alex {
 				  const info_type conditional_yx);
 		bool kill_link(const info_type value);
 		bool create_link(const info_type value);
+		float learning_rate();
+		float momentum();
+		float weight_decay();
 		
 	}; //class Phenotype
 
 } //namespace alex
+
+/*
+//        The purpose of this function is to convert an unsigned
+//        binary number to reflected binary Gray code.
+
+unsigned int binaryToGray(unsigned int num)
+{
+        return (num>>1) ^ num;
+}
+ 
+//        The purpose of this function is to convert a reflected binary
+//        Gray code number to a binary number.
+
+unsigned int grayToBinary(unsigned int num)
+{
+    unsigned int numBits = 8 * sizeof(num);
+    unsigned int shift;
+    for (shift = 1; shift < numBits; shift *= 2)
+    {
+        num ^= num >> shift;
+    }
+    return num;
+}
+*/
 
 #endif
