@@ -21,20 +21,61 @@
     e-mail: jackwhall7@gmail.com
 */
 
+#include <random>
+
 namespace alex {
 
-	struct ChanceFunction {
-	
+	template<unsigned int N>
+	class ChanceFunction {
+	private:
+		vector<float> steepness;
+		float vertical_bias, lateral_bias, scale_factor;
+    		std::minstd_rand generator;
+		
+	public:
+		ChanceFunction() = delete;
+		ChanceFunction(const vector<float>& steep, 
+			       const float vbias, 
+			       const float lbias, 
+			       const float scale)
+			: steepness(steep), vertical_bias(vbias), 
+			  lateral_bias(lbias), scale_factor(scale),
+			  generator(std::random_device) {}
+		ChanceFunction(const ChanceFunction& rhs) = delete;
+		ChanceFunction& operator=(const ChanceFunction& rhs) = delete;
+		~ChanceFunction() = default;
+		
+		bool operator()(const vector<float>& inputs) const { //slow memory allocation
+			if( steepness.size() != inputs.size() ) throw;
+			
+			float z = lateral_bias;
+			
+			auto it = steepness.begin();
+			auto ite = steepness.end();
+			auto itt = inputs.begin();
+			while(it != ite) {
+				z += (*it) * (*itt);
+				++it; ++itt;
+			}
+			
+			float chance = vertical_bias + scale_factor/(1 + exp(-z));
+			float critical_float = 1/(1 + exp(-chance)); //to normalize between 0 and 1
+			float random_float = std::generate_canonical<float, 10>(generator);
+			return random_float < critical_float;
+		}
 	}; //struct ChanceFunction
 	
 
+	template<unsigned int N>
 	class Phenotype {
 	private:
-		//function objects for parameterized sigmoids
+		
 		
 	public:
+		ChanceFunction kill_node, clone_node, create_child, kill_link, create_link;
+	
 		Phenotype() = delete;
-		explicit Phenotype(Genotype& genome);
+		explicit Phenotype(Genotype<N>& genome);
 		Phenotype(const Phenotype& rhs) = delete;
 		//Phenotype(Phenotype&& rhs);
 		Phenotype& operator=(const Phenotype& rhs) = delete;
@@ -48,6 +89,8 @@ namespace alex {
 				  const info_type conditional_yx);
 		bool kill_link(const info_type value);
 		bool create_link(const info_type value);
+		
+		//how to represent these?
 		float learning_rate();
 		float momentum();
 		float weight_decay();
