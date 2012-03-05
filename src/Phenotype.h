@@ -25,15 +25,24 @@
 
 namespace alex {
 
-	template<unsigned int N>
 	class ChanceFunction {
 	private:
 		vector<float> steepness;
 		float vertical_bias, lateral_bias, scale_factor;
     		std::minstd_rand generator;
+    		
+    		bool result(const float z) {
+    			float chance = vertical_bias + scale_factor/(1 + exp(-z));
+			float critical_float = 1/(1 + exp(-chance)); //force between 0 and 1
+			float random_float = std::generate_canonical<float, 10>(generator);
+			return random_float < critical_float;
+    		}
 		
 	public:
-		ChanceFunction() = delete;
+		ChanceFunction()
+			: steepness(), vertical_bias(-1000000.0), //makes sigmoid result tiny
+			  lateral_bias(0.0), scale_factor(0.0),
+			  generator(std::random_device) {}
 		ChanceFunction(const vector<float>& steep, 
 			       const float vbias, 
 			       const float lbias, 
@@ -42,53 +51,44 @@ namespace alex {
 			  lateral_bias(lbias), scale_factor(scale),
 			  generator(std::random_device) {}
 		ChanceFunction(const ChanceFunction& rhs) = delete;
-		ChanceFunction& operator=(const ChanceFunction& rhs) = delete;
+		ChanceFunction& operator=(const ChanceFunction& rhs) = default;
 		~ChanceFunction() = default;
 		
-		bool operator()(const vector<float>& inputs) const { //slow memory allocation
-			if( steepness.size() != inputs.size() ) throw;
-			
-			float z = lateral_bias;
-			
-			auto it = steepness.begin();
-			auto ite = steepness.end();
-			auto itt = inputs.begin();
-			while(it != ite) {
-				z += (*it) * (*itt);
-				++it; ++itt;
-			}
-			
-			float chance = vertical_bias + scale_factor/(1 + exp(-z));
-			float critical_float = 1/(1 + exp(-chance)); //to normalize between 0 and 1
-			float random_float = std::generate_canonical<float, 10>(generator);
-			return random_float < critical_float;
+		bool operator()() const {
+			return 1/(1 + exp(-vertical_bias)); //constant value between 0 and 1
+		}
+		
+		bool operator()(const float input) const { 
+			if( steepness.size() != 1 ) throw;
+			float z = lateral_bias + input*steepness[0];
+			return result(z);
+		}
+		
+		bool operator()(const float input1, const float input2) const {
+			if( steepness.size() != 2 ) throw;
+			float z = lateral_bias + input1*steepness[0] + input2*steepness[1];
+			return result(z);
 		}
 	}; //struct ChanceFunction
 	
 
-	template<unsigned int N>
 	class Phenotype {
 	private:
+		unsigned long binaryToGray(unsigned long num) 
+			{ return (num>>1) ^ num; }
+		template<unsigned int N> get_integer(bitset<N>& sequence, unsigned int start);
 		
+		ChanceFunction clone_node_fcn, create_child_fcn, kill_link_fcn, create_link_fcn;
+		float learning_rate_val, momentum_val, weight_decay_val; //constant values for now
 		
 	public:
-		ChanceFunction kill_node, clone_node, create_child, kill_link, create_link;
-	
 		Phenotype() = delete;
-		explicit Phenotype(Genotype<N>& genome);
+		template<unsigned int N> explicit Phenotype(Genotype<N>& genome);
 		Phenotype(const Phenotype& rhs) = delete;
 		//Phenotype(Phenotype&& rhs);
 		Phenotype& operator=(const Phenotype& rhs) = delete;
 		//Phenotype& operator=(Phenotype&& rhs);
 		~Phenotype() = default;
-		
-		bool kill_node(const info_type value);
-		bool clone_node(const info_type conditional_xy, 
-				const info_type conditional_yx);
-		bool create_child(const info_type conditional_xy, 
-				  const info_type conditional_yx);
-		bool kill_link(const info_type value);
-		bool create_link(const info_type value);
 		
 		//how to represent these?
 		float learning_rate();
@@ -98,29 +98,5 @@ namespace alex {
 	}; //class Phenotype
 
 } //namespace alex
-
-/*
-//        The purpose of this function is to convert an unsigned
-//        binary number to reflected binary Gray code.
-
-unsigned int binaryToGray(unsigned int num)
-{
-        return (num>>1) ^ num;
-}
- 
-//        The purpose of this function is to convert a reflected binary
-//        Gray code number to a binary number.
-
-unsigned int grayToBinary(unsigned int num)
-{
-    unsigned int numBits = 8 * sizeof(num);
-    unsigned int shift;
-    for (shift = 1; shift < numBits; shift *= 2)
-    {
-        num ^= num >> shift;
-    }
-    return num;
-}
-*/
 
 #endif

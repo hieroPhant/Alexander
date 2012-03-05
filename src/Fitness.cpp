@@ -1,6 +1,3 @@
-#ifndef Fitness_h
-#define Fitness_h
-
 /*
     Alexander: a neural networks library
     Copyright (C) 2011-2012  Jack Hall
@@ -21,34 +18,31 @@
     e-mail: jackwhall7@gmail.com
 */
 
-#include <map>
-
 namespace alex {
-
-	template<unsigned int N>
-	class Fitness {
-	private:
-		map<unsigned int, Genotype<N>*> population;
-		
-	public:
-		Fitness() = default;
-		Fitness(const Fitness& rhs) = delete;
-		//Fitness(Fitness&& rhs);
-		Fitness& operator=(const Fitness& rhs) = delete;
-		//Fitness& operator=(Fitness&& rhs);
-		~Fitness() = default;
-		
-		unsigned int genome_length() { return N; }
-		unsigned population_size() { return population.size(); }
-		
-		bitset<N> generate();
-		bitset<N> generate(const unsigned int parent);
-		void add(const unsigned int address, Genotype<N>* new_genome);
-		void remove(const unsigned int address);
-		void update(const unsigned int address, Genotype<N>* pGenotype);
-		
-	}; //class Fitness
-
+	
+	template<unsigned int N> 
+	std::bitset<N> generate() {
+	
+	}
+	
+	template<unsigned int N> 
+	std::bitset<N> generate(const unsigned int parent) {
+	
+	}
+	
+	template<unsigned int N> 
+	void add(const unsigned int address, Genotype<N>* new_genome) {
+	
+	}
+	
+	template<unsigned int N> 
+	void remove(const unsigned int address) {
+	
+	}
+	
+	template<unsigned int N> 
+	void update(const unsigned int address, Genotype<N>* pGenotype) {
+	
+	} 
+	
 } //namespace alex
-
-#endif

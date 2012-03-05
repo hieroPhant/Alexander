@@ -41,7 +41,7 @@ namespace alex {
 		ben::Index<pdf_type, info_type> information; //full set of possible connections
 	
 		Value distributions; //centralized pdf and information matrix
-		Fitness fitness; //centralized evolutionary data
+		Fitness<352> fitness; //centralized evolutionary data
 		
 		Organism() = default;
 		Organism(const Organism& rhs) = delete;
