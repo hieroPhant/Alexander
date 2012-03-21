@@ -25,10 +25,10 @@
 
 namespace alex {
 
-	template<unsigned int N>
+	template<unsigned int N, unsigned int I, unsigned int O>
 	class Fitness {
 	private:
-		map<unsigned int, Genotype<N>*> population;
+		map<unsigned int, Genotype<N,I,O>*> population;
 		
 	public:
 		Fitness() = default;
@@ -38,11 +38,9 @@ namespace alex {
 		//Fitness& operator=(Fitness&& rhs);
 		~Fitness() = default;
 		
-		unsigned int genome_length() { return N; }
 		unsigned population_size() { return population.size(); }
 		
-		bitset<N> generate();
-		bitset<N> generate(const unsigned int parent);
+		Genotype<N,I,O> generate();
 		void add(const unsigned int address, Genotype<N>* new_genome);
 		void remove(const unsigned int address);
 		void update(const unsigned int address, Genotype<N>* pGenotype);

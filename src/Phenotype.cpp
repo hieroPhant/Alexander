@@ -20,8 +20,8 @@
 
 namespace alex {
 
-	template<unsigned int N>
-	Phenotype::Phenotype(Genotype<N>& genome) {
+	template<unsigned int N,I,O>
+	Phenotype::Phenotype(Genotype<N,I,O>& genome) {
 		//parse bitset into vector of floats
 		float numerator, denominator, sign = 1.0;
 		vector<float> floats(N/9, 0.0);
@@ -41,27 +41,59 @@ namespace alex {
 		}
 		
 		it = floats.begin();
+		//extract data for links, functions, input_decisions, output_coefficients
+		
+		/////////////////////
+		//old version, with chance functions
 		
 		//parse ChanceFunctions
-		vector<float> dummy; //using constant-value chance functions for now
-		clone_node_fcn = ChanceFunction(dummy, *it, 0.0, 0.0); ++it; //set vertical bias
-		create_child_fcn = ChanceFunction(dummy, *it, 0.0, 0.0); ++it;
-		kill_link_fcn = ChanceFunction(dummy, *it, 0.0, 0.0); ++it;
-		create_link_fcn = ChanceFunction(dummy, *it, 0.0, 0.0); ++it;
+		//vector<float> dummy; //using constant-value chance functions for now
+		//clone_node_fcn = ChanceFunction(dummy, *it, 0.0, 0.0); ++it; //set vertical bias
+		//create_child_fcn = ChanceFunction(dummy, *it, 0.0, 0.0); ++it;
+		//kill_link_fcn = ChanceFunction(dummy, *it, 0.0, 0.0); ++it;
+		//create_link_fcn = ChanceFunction(dummy, *it, 0.0, 0.0); ++it;
 		
 		//parse learning_rate, momentum, and weight_decay
-		learning_rate_val = 1/( 1 + exp(-(*it)) ); ++it;
-		momentum_val = 1/( 1 + exp(-(*it)) ); ++it;
-		weight_decay_val = 1/( 1 + exp(-(*it)) ); 
+		//learning_rate_val = 1/( 1 + exp(-(*it)) ); ++it;
+		//momentum_val = 1/( 1 + exp(-(*it)) ); ++it;
+		//weight_decay_val = 1/( 1 + exp(-(*it)) ); 
 	} //constructor
 
 	template<unsigned int N> 
-	unsigned long Phenotype::get_integer(bitset<N>& sequence, unsigned int start) {
-		bitset<8> integer;
-		unsigned int i, j;
-		for(i=start, j=0; i<(start+8); ++i, ++j) integer[j] = sequence[i];
-		return binaryToGray( integer.to_ulong() );
+	unsigned long Phenotype::get_integer(std::bitset<N>& sequence, unsigned int start) {
+		std::bitset<8> integer = get_subset<N,8>(sequence, start);
+		return gray_to_binary( integer.to_ulong() );
 	} //get_integer
+	
+	template<unsigned int N, unsigned int M>
+	std::bitset<M> Phenotype::get_subset(std::bitset<M>& sequence, unsigned int start) {
+		std::bitset<M> subset;
+		unsigned int i=start, j=0;
+		for(i, j; i<(start+M); ++i, ++j) subset[j] = sequence[i];
+		return subset;
+	}
+	
+	unsigned long gray_to_binary(unsigned long num)
+	{
+	    unsigned int numBits = 8 * sizeof(num);
+	    unsigned int shift;
+	    for (shift = 1; shift < numBits; shift *= 2)
+	    {
+		num ^= num >> shift;
+	    }
+	    return num;
+	}
+	
+	void Phenotype::run(const float value; const float dvalue; const float persistence) {
+		//run decision boundaries on inputs
+		//evaluate boolean network (update state)
+		//calculate and store current output values
+	}
+	
+	bool Phenotype::flip_coin(const float probability) const {
+		//generate random number
+		//if random number is less than probability, return true
+	}
 	
 } //namespace alex
 

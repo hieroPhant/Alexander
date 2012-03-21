@@ -20,29 +20,26 @@
 
 namespace alex {
 	
-	template<unsigned int N> 
-	std::bitset<N> generate() {
-	
+	template<unsigned int N, unsigned int I, unsigned int O> 
+	Genotype<N,I,O> generate() {
+		//decide which two Genotypes to breed
+		//think about returning std::pair of pointers rather than new Genotype
 	}
 	
-	template<unsigned int N> 
-	std::bitset<N> generate(const unsigned int parent) {
-	
-	}
-	
-	template<unsigned int N> 
+	template<unsigned int N, unsigned int I, unsigned int O> 
 	void add(const unsigned int address, Genotype<N>* new_genome) {
-	
+		//check for existing element
+		//add new
 	}
 	
-	template<unsigned int N> 
+	template<unsigned int N, unsigned int I, unsigned int O> 
 	void remove(const unsigned int address) {
-	
+		//find and remove element
 	}
 	
-	template<unsigned int N> 
+	template<unsigned int N, unsigned int I, unsigned int O> 
 	void update(const unsigned int address, Genotype<N>* pGenotype) {
-	
+		//change element->second
 	} 
 	
 } //namespace alex

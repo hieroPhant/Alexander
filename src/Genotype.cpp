@@ -20,22 +20,24 @@
 
 namespace alex {
 
-	template<unsigned int N>
+	template<unsigned int N, unsigned int I, unsigned int O>
 	Genotype::Genotype(const unsigned int nID, 
-			   const bitset<N>& bGenome, 
-			   Fitness<N>* pFitness) 
-		: ID(nID), genome(bGenome), fitness(pFitness), value(0.0) {
+			   Fitness<N,I,O>* pFitness) 
+		: ID(nID), fitness(pFitness), value(0.0) {
+		fitness->add(ID, this);
+		//create randomized chromosomes
+	} //constructor
+	
+	template<unsigned int N, unsigned int I, unsigned int O>
+	Genotype::Genotype(const unsigned int nID, const Genotype& mother, const Genotype& father) 
+		: ID(nID), decision_chromosome(), 
+		  fitness(mother.fitness), value(0.0) {
+		//breed new chromosomes from parents, use hardcoded mutation and crossover rates
+		//may want to take a std::pair of pointers as arguments
 		fitness->add(ID, this);
 	} //constructor
 	
-	template<unsigned int N>
-	Genotype::Genotype(const unsigned int nID, const Genotype& rhs) 
-		: ID(nID), genome( rhs.fitness->generate(rhs.ID) ), 
-		  fitness(rhs.fitness), value(0.0) {
-		fitness->add(ID, this);
-	} //constructor
-	
-	template<unsigned int N>
+	template<unsigned int N, unsigned int I, unsigned int O>
 	Genotype::~Genotype() {
 		fitness->remove(ID);
 	} //destructor
