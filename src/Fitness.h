@@ -30,6 +30,8 @@ namespace alex {
 	private:
 		map<unsigned int, Genotype<N,I,O>*> population;
 		
+		Genotype<N,I,O>* select(vector<info_type> values, info_type total);
+		
 	public:
 		Fitness() = default;
 		Fitness(const Fitness& rhs) = delete;
@@ -40,7 +42,7 @@ namespace alex {
 		
 		unsigned population_size() { return population.size(); }
 		
-		Genotype<N,I,O> generate();
+		std::pair< Genotype<N,I,O>*, Genotype<N,I,O>* > generate();
 		void add(const unsigned int address, Genotype<N>* new_genome);
 		void remove(const unsigned int address);
 		void update(const unsigned int address, Genotype<N>* pGenotype);

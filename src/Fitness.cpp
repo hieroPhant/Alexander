@@ -21,25 +21,59 @@
 namespace alex {
 	
 	template<unsigned int N, unsigned int I, unsigned int O> 
-	Genotype<N,I,O> generate() {
-		//decide which two Genotypes to breed
-		//think about returning std::pair of pointers rather than new Genotype
+	std::pair< Genotype<N,I,O>*, Genotype<N,I,O>* > Fitness<N,I,O>::generate() {
+		vector<info_type> values( population.size(), 0.0 );
+		info_type total=0.0;
+		auto itv = values.begin();
+		auto it = population.begin();
+		auto ite = population.end();
+		while(it != ite) {
+			*itv = it->second->value;
+			total += *itv;
+			++it; ++itv;
+		}
+		
+		Genotype<N,I,O>* mother( select(value, total) );
+		Genotype<N,I,O>* father( select(value, total) );
+		while(mother == father) father = select(value,total); //ensure parents differ
+		std::pair< Genotype<N,I,O>*, Genotype<N,I,O>* > parents(mother, father);
+		return parents;
+	}
+	
+	template<unsigned int N, unsigned int I, unsigned int O>
+	Genotype<N,I,O>* Fitness<N,I,O>::select(const vector<info_type>& values, 
+						const info_type total) {
+		//assumes values are all positive numbers
+		float choice = total * std::generate_canonical<float, 15>(generator);
+		
+		auto it = values.begin();
+		auto ite = values.end();
+		auto itm = population.begin();
+		while(it != ite) {
+			choice -= *it;
+			if(choice < 0) break;
+			++it; ++itm;
+		}
+		return itm->second; //should not be void if choice is between zero and one
 	}
 	
 	template<unsigned int N, unsigned int I, unsigned int O> 
-	void add(const unsigned int address, Genotype<N>* new_genome) {
-		//check for existing element
-		//add new
+	bool Fitness<N,I,O>::add(const unsigned int address, Genotype<N,I,O>* new_genome) {
+		pair< unsigned int, Genotype<N,I,O>* > element;
+		auto result = population.insert( std::make_pair(address, new_genome) );
+		return result->second; //whether element was inserted
 	}
 	
 	template<unsigned int N, unsigned int I, unsigned int O> 
-	void remove(const unsigned int address) {
-		//find and remove element
+	void Fitness<N,I,O>::remove(const unsigned int address) {
+		population.erase(address);
 	}
 	
 	template<unsigned int N, unsigned int I, unsigned int O> 
-	void update(const unsigned int address, Genotype<N>* pGenotype) {
-		//change element->second
+	bool Fitness<N,I,O>::update(const unsigned int address, Genotype<N>* pGenotype) {
+		auto it = population.find(address);
+		if(it != population.end()) { it->second = pGenotype; return true; }
+		else return false; //whether element existed in the first place
 	} 
 	
 } //namespace alex

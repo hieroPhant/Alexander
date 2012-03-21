@@ -22,7 +22,7 @@
 */
 
 #include <array>
-#include <bitset>
+#include <bitset> //hold a maximum of 32 bits
 
 namespace alex {
 
@@ -40,6 +40,8 @@ namespace alex {
 		std::bitset<N*N*2*2 + (I+O+1)*17*N> decision_chromosome;
 		std::array< std::bitset<N*N + N>, N*N > link_chromosome;
 		//mutation and crossover rates? probably just hardcode these for now
+		
+		std::minstd_rand generator;
 		
 	public:
 		const unsigned int ID;
