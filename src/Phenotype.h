@@ -37,6 +37,8 @@ namespace alex {
 		std::bitset<M> get_subset(std::bitset<N>& sequence, unsigned int start) const;
 		template<unsigned int N> 
 		unsigned long get_integer(std::bitset<N>& sequence, unsigned int start) const;
+		template<unsigned int N>
+		float get_real(std::bitset<N>& sequence, unsigned int start) const;
 		
 		///////////////////////
 		//current output values

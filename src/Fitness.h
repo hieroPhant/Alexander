@@ -29,7 +29,7 @@ namespace alex {
 	class Fitness {
 	private:
 		map<unsigned int, Genotype<N,I,O>*> population;
-		std::minstd_rand generator;
+		std::minstd_rand generator; //for choosing individuals for breeding
 		
 		Genotype<N,I,O>* select(vector<info_type> values, info_type total);
 		
@@ -43,7 +43,7 @@ namespace alex {
 		
 		unsigned population_size() { return population.size(); }
 		
-		std::pair< Genotype<N,I,O>*, Genotype<N,I,O>* > generate();
+		std::pair< Genotype<N,I,O>*, Genotype<N,I,O>* > breed() const;
 		void add(const unsigned int address, Genotype<N>* new_genome);
 		void remove(const unsigned int address);
 		void update(const unsigned int address, Genotype<N>* pGenotype);

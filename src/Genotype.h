@@ -22,16 +22,16 @@
 */
 
 #include <array>
-#include <bitset> //hold a maximum of 32 bits
+#include <bitset>
 
 namespace alex {
 
 	template<unsigned int N, unsigned int I, unsigned int O>
 	class Fitness;
 
-	//N is # of attractors, sqrt of # of nodes
-	//I is # of inputs to gene network
-	//O is # of outputs from gene network
+	//N is # of attractors (sqrt of # of nodes)
+	//I is # of non-boolean inputs to gene network
+	//O is # of non-boolean outputs from the network
 	template<unsigned int N=5, unsigned int I=3, unsigned int O=7> 
 	class Genotype {
 	private:
@@ -52,7 +52,7 @@ namespace alex {
 			 Fitness<N,I,O>* pFitness);
 		Genotype(const unsigned int nID, const Genotype& mother, const Genotype& father);
 		Genotype(const Genotype& rhs) = delete;
-		Genotype(Genotype&& rhs); //need this because Fitness decides breeding
+		//Genotype(Genotype&& rhs); 
 		Genotype& operator=(const Genotype& rhs) = delete;
 		//Genotype& operator=(Genotype&& rhs);
 		~Genotype();
