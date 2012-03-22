@@ -29,6 +29,7 @@ namespace alex {
 	class Fitness {
 	private:
 		map<unsigned int, Genotype<N,I,O>*> population;
+		std::minstd_rand generator;
 		
 		Genotype<N,I,O>* select(vector<info_type> values, info_type total);
 		

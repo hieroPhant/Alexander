@@ -54,7 +54,7 @@ namespace alex {
 			if(choice < 0) break;
 			++it; ++itm;
 		}
-		return itm->second; //should not be void if choice is between zero and one
+		return itm->second; //should be valid if choice is between zero and one
 	}
 	
 	template<unsigned int N, unsigned int I, unsigned int O> 
@@ -77,3 +77,4 @@ namespace alex {
 	} 
 	
 } //namespace alex
+
