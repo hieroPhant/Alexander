@@ -50,40 +50,56 @@ namespace alex {
 	template<unsigned int N, unsigned int I, unsigned int O>
 	Genotype::Genotype(const unsigned int nID, const std::pair<Genotype*, Genotype*> parents) 
 		: ID(nID), decision_chromosome(), link_chromosome(),
-		  fitness(parents->first->fitness), value(0.0), generator(nID) {
+		  fitness(parents.first->fitness), value(0.0), generator(nID) {
 		
 		float mutation_rate = 0.2, crossover_rate = 0.5;
+		int i, j, ii, jj;
 		
 		//breed new chromosomes from parents, use hardcoded mutation and crossover rates
 		fitness->add(ID, this);
 		
 		//what does crossover rate mean?
 		//generate 2 random numbers for decision_chromosome crossover
+		std::uniform_int_distribution<> random_int(0, decision_chromosome.size() - 1);
 		std::bernoulli_distribution crossover(crossover_rate);
 		if( crossover(generator) ) {
-			//crossover decision_chromosome
+			i = random_int(generator);
+			for(ii=i; ii>=0; --ii) 
+				decision_chromosome[ii] = parents.first->decision_chromosome[ii];
+			
+			for(ii=decision_chromosome.size()-1; ii>i; --ii) 
+				decision_chromosome[ii] = parents.second->decision_chromosome[ii];
 		}
 		
 		//decide whether to mutate
 		std::bernoulli_distribution mutate(mutation_rate);
-		std::uniform_int_distribution<> random_int(0, decision_chromosome.size() - 1);
+		random_int = std::uniform_int_distribution<>(0, decision_chromosome.size() - 1);
 		if( mutate(generator) ) ~decision_chromosome[random_int(generator)];
 		
 		//generate 2 random numbers for link_chromosome crossover
 		if( crossover(generator) ) {
-			//crossover link_chromosome
+			ii = random_int(generator);
+			for(i=i; i>=0; --i) 
+				for(j=link_chromosome[0].size()-1; j>=0; --j)
+					link_chromosome[i][j] = parents.first->link_chromosome[i][j];
+			
+			for(i=decision_chromosome.size()-1; i>ii; --i) 
+				for(j=link_chromosome[0].size()-1; j>=0; --j)
+					link_chromosome[i][j] = parents.second->link_chromosome[i][j];
 		}
 		
 		//decide whether to mutate
 		//mutations must occur in pairs to preserve K=2 connectivity
 		random_int = std::uniform_int_distribution<>(0, link_chromosome.size() - 1);
-		int i = random_int(generator); //which bitset
+		i = random_int(generator); //which bitset
+		
 		random_int = std::uniform_int_distribution<>(0, link_chromosome[0].size() - 1);
-		int j = random_int(generator); //which false bit to flip
+		j = random_int(generator); //which false bit to flip
+		
 		std::bernoulli_distribution random_bit(0.5);
 		bool first = random_bit(generator); //which true bit to flip
 		
-		int ii = link_chromosome[0].size() - 1;
+		ii = link_chromosome[0].size() - 1;
 		if( mutate(generator) ) {
 			for(ii; ii>=0; --ii) {
 				if( link_chromosome[i][ii] ) {

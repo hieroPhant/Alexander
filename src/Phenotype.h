@@ -31,6 +31,8 @@ namespace alex {
 		//unsigned long binary_to_gray(unsigned long num) { return (num>>1) ^ num; }
 		unsigned long gray_to_binary(unsigned long num);
 		bool flip_coin(const float probability);
+		bool gene_fcn(const unsigned int gene_index, const bool a, const bool b) const;
+		float sigmoid(const float x) const;
 		
 		//following only called by constructor
 		template<unsigned int N, unsigned int M>
@@ -52,7 +54,7 @@ namespace alex {
 		//array of pairs of input links
 		std::array< std::array<unsigned int,2>, 25 > links; //genes<inputs>
 		//boolean functions of two inputs
-		std::array< std::bitset<4> > functions; //order: 00, 01, 10, 11
+		std::array< std::bitset<4>, 25 > functions; //order: 00, 01, 10, 11
 		//input decision boundaries and biases to decide boolean inputs
 		std::array< std::array<float, 4>, 5 > input_decisions; //rows<columns>
 		//weights to calculate outputs from boolean network
@@ -61,7 +63,7 @@ namespace alex {
 		/////////////////////////
 		//current internal states
 		//current states of boolean switches (genes)
-		std::bitset<25> state;
+		std::bitset<30> state;
 		//random number generator
 		std::minstd_rand generator;
 		

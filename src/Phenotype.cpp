@@ -21,26 +21,60 @@
 namespace alex {
 
 	template<unsigned int N,I,O>
-	Phenotype::Phenotype(Genotype<N,I,O>& genome) {
-		//parse bitset into vector of floats
-		float numerator, denominator, sign = 1.0;
-		vector<float> floats(N/9, 0.0);
-		auto it = floats.begin();
-		
-		for(unsigned int i=0; i<N; i+=9) {
-			//get sign
-			if(genome.genome[i]) sign = 1.0;
-			else sign = -1.0;
-			
-			//get integer components
-			numerator = get_integer(genome.genome, i)
-			denominator = get_integer(genome.genome, i+8)
-			
-			*it = sign*numerator/(1.0 + denominator);
-			++it;
+	Phenotype::Phenotype(Genotype<N,I,O>& genome) {	
+		//extract boolean functions (4 bits each)	
+		auto itf = functions.begin();
+		auto itfe = functions.end();
+		int i = 0, j;
+		while(itf != itfe) {
+			for(j=3; j>=0; --j, ++i) (*itf)[j] = genome.decision_chromosome[i];
+			++itf;
 		}
 		
-		it = floats.begin();
+		//extract input decision boundaries
+		auto iti = input_decisions.begin();
+		auto itie = input_decisions.end();
+		array<float, 4>::iterator it, ite; //for inner arrays
+		while(iti != itie) {
+			it = iti->begin();
+			ite = iti->end();
+			while(it != ite) {
+				*it = get_real(genome.decision_chromosome, i);
+				++it; i+=17;
+			}
+			++iti;
+		}
+		
+		//extract output weights
+		auto ito = output_weights.begin();
+		auto itoe = output_weights.end();
+		array<float, 5>::iterator iter, itere; //for inner arrays
+		while(ito != itoe) {
+			iter = ito->begin();
+			itere = ito->end();
+			while(iter != itere) {
+				*iter = get_real(genome.decision_chromosome, i);
+				++iter; i+=17;
+			}
+			++ito;
+		}
+		
+		//extract gene connectivity
+		auto itl = genome.link_chromosome.begin();
+		auto itc = links.begin();
+		auto itce = links.end();
+		while(itc != itce) {
+			j = 0;
+			for(i=itl->size()-1; i>=0; --i) {
+				if( (*itl)[i] ) {
+					(*itc)[j] = i;
+					++j;
+				}
+				if(j == 2) break;
+			}
+			++itc; ++itl;
+		}
+		
 		//extract data for links, functions, input_decisions, output_coefficients
 		
 		/////////////////////
@@ -112,9 +146,50 @@ namespace alex {
 	
 	void Phenotype::run(const float value; const float dvalue; const float persistence) {
 		//run decision boundaries on inputs
+		std::array< std::array<float, 4>, 5 >& w = input_decisions; //shorthand
+		int i;
+		for(i=4; i>=0; --i) 
+			state[i] = ( w[i][0]*value + w[i][1]*dvalue 
+				    +w[i][2]*persistence + w[i][3] ) > 0;
+		
 		//evaluate boolean network (update state)
+		bitset<25> new_state;
+		for(i=24; i>=0; --i) 
+			new_state[i] = gene_fcn( i, state[ links[i][0] ], state[ links[i][1] ] );
+		
+		for(i=24, i>=0; --i) state[i+5] = new_state[i];
+
 		//calculate and store current output values
+		std::array< std::array<float, 5>, 7 >& v = output_weights; //shorthand
+		std::array<float, 7> outputs;
+		for(i=6; i>=0; --i) {
+			//calculate values from v and states
+			outputs[i] = 0.0;
+			for(int j=4; j>=0; --j) outputs[i] += v[i][j] * state[25+j];
+		}
+		//run each element of output through a sigmoid
+		learning_rate_val = sigmoid(outputs[0]);
+		momentum_val 	  = sigmoid(outputs[1]);
+		weight_decay_val  = sigmoid(outputs[2]);
+		forget_factor_val = sigmoid(outputs[3]);
+		kill_link_prob	  = sigmoid(outputs[4]);
+		make_link_prob 	  = sigmoid(outputs[5]);
+		make_node_prob	  = sigmoid(outputs[6]);
 	} //run
+	
+	float Phenotype::sigmoid(const float x) const {
+		return 1/(1 + exp(-x));
+	}
+	
+	bool Phenotype::gene_fcn(const unsigned int gene_index, const bool a, const bool b) const {
+		if(a) {
+			if(b) return functions[gene_index][3];
+			else  return functions[gene_index][2];
+		} else {
+			if(b) return functions[gene_index][1];
+			else  return functions[gene_index][0];
+		}
+	}
 	
 	bool Phenotype::flip_coin(const float probability) {
 		//generate random bit from given probability
