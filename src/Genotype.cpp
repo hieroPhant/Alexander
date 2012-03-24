@@ -64,9 +64,12 @@ namespace alex {
 		std::bernoulli_distribution crossover(crossover_rate);
 		if( crossover(generator) ) {
 			i = random_int(generator);
+			
+			//take beginning of chromosome from first parent ...
 			for(ii=i; ii>=0; --ii) 
 				decision_chromosome[ii] = parents.first->decision_chromosome[ii];
 			
+			//... and the rest from the second parent
 			for(ii=decision_chromosome.size()-1; ii>i; --ii) 
 				decision_chromosome[ii] = parents.second->decision_chromosome[ii];
 		}
@@ -74,15 +77,18 @@ namespace alex {
 		//decide whether to mutate
 		std::bernoulli_distribution mutate(mutation_rate);
 		random_int = std::uniform_int_distribution<>(0, decision_chromosome.size() - 1);
-		if( mutate(generator) ) ~decision_chromosome[random_int(generator)];
+		if( mutate(generator) ) ~decision_chromosome[random_int(generator)]; //flip a bit
 		
 		//generate 2 random numbers for link_chromosome crossover
 		if( crossover(generator) ) {
 			ii = random_int(generator);
-			for(i=i; i>=0; --i) 
-				for(j=link_chromosome[0].size()-1; j>=0; --j)
+			
+			//take beginning of chromosome from first parent ...
+			for(i=i; i>=0; --i) //over genetic nodes
+				for(j=link_chromosome[0].size()-1; j>=0; --j) //over each connectivity vector
 					link_chromosome[i][j] = parents.first->link_chromosome[i][j];
 			
+			//... and the rest from the second parent
 			for(i=decision_chromosome.size()-1; i>ii; --i) 
 				for(j=link_chromosome[0].size()-1; j>=0; --j)
 					link_chromosome[i][j] = parents.second->link_chromosome[i][j];
@@ -97,20 +103,21 @@ namespace alex {
 		j = random_int(generator); //which false bit to flip
 		
 		std::bernoulli_distribution random_bit(0.5);
-		bool first = random_bit(generator); //which true bit to flip
+		bool first = random_bit(generator); //which true bit to flip (there are only 2)
 		
 		ii = link_chromosome[0].size() - 1;
 		if( mutate(generator) ) {
 			for(ii; ii>=0; --ii) {
-				if( link_chromosome[i][ii] ) {
+				if( link_chromosome[i][ii] ) { //true bit found
 					if(first) { link_chromosome[i][ii] = false; break; }
-					else first = true;
-				} //if
-			} //for
+					else first = true; //flip next true bit
+				} 
+			} 
 			
 			while(link_chromosome[i][j]) { //make sure bit is false to start with
 				j = random_int(generator);
-			} //while
+			} 
+			//may reflip the same bit, but it doesn't matter; happens rarely
 			link_chromosome[i][j] = true;
 		} //if
 		

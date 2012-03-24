@@ -35,8 +35,6 @@ namespace alex {
 		float sigmoid(const float x) const;
 		
 		//following only called by constructor
-		template<unsigned int N, unsigned int M>
-		std::bitset<M> get_subset(std::bitset<N>& sequence, unsigned int start) const;
 		template<unsigned int N> 
 		unsigned long get_integer(std::bitset<N>& sequence, unsigned int start) const;
 		template<unsigned int N>

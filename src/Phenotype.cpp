@@ -22,38 +22,49 @@ namespace alex {
 
 	template<unsigned int N,I,O>
 	Phenotype::Phenotype(Genotype<N,I,O>& genome) {	
-		//extract boolean functions (4 bits each)	
-		auto itf = functions.begin();
+
+		int n = N*N*2*2 + (I+O+1)*17*N;
+		
+		//extract boolean functions (4 bits each)
+		auto itf = functions.begin(); //iterators over genetic nodes (25)
 		auto itfe = functions.end();
-		int i = 0, j;
+		int i = 0; //current index in decision_chromosome
+		int j; //temporary loop counter, reused
 		while(itf != itfe) {
+			//grab four bits and store them in the proper bitset
 			for(j=3; j>=0; --j, ++i) (*itf)[j] = genome.decision_chromosome[i];
 			++itf;
 		}
 		
 		//extract input decision boundaries
-		auto iti = input_decisions.begin();
+		auto iti = input_decisions.begin(); //iterators for boolean genetic inputs (5)
 		auto itie = input_decisions.end();
-		array<float, 4>::iterator it, ite; //for inner arrays
+		array<float, 4>::iterator it, ite; //iterators for inner arrays
 		while(iti != itie) {
+			//get iterators for inner array (one set of boundary parameters)
 			it = iti->begin();
 			ite = iti->end();
+			
+			//extract a float for each inner array element
 			while(it != ite) {
-				*it = get_real(genome.decision_chromosome, i);
+				*it = get_real<n>(genome.decision_chromosome, i);
 				++it; i+=17;
 			}
 			++iti;
 		}
 		
 		//extract output weights
-		auto ito = output_weights.begin();
+		auto ito = output_weights.begin(); //iterators for real outputs (7)
 		auto itoe = output_weights.end();
-		array<float, 5>::iterator iter, itere; //for inner arrays
+		array<float, 5>::iterator iter, itere; //iterators for inner arrays
 		while(ito != itoe) {
+			//get iterators for inner array (one set of output weights)
 			iter = ito->begin();
 			itere = ito->end();
+			
+			//extract a float for each inner array element
 			while(iter != itere) {
-				*iter = get_real(genome.decision_chromosome, i);
+				*iter = get_real<n>(genome.decision_chromosome, i);
 				++iter; i+=17;
 			}
 			++ito;
@@ -64,13 +75,13 @@ namespace alex {
 		auto itc = links.begin();
 		auto itce = links.end();
 		while(itc != itce) {
-			j = 0;
+			j = 0; //no links recorded for current genetic node
 			for(i=itl->size()-1; i>=0; --i) {
-				if( (*itl)[i] ) {
-					(*itc)[j] = i;
-					++j;
+				if( (*itl)[i] ) { 
+					(*itc)[j] = i; //record index of origin genetic node
+					++j; //increment link counter
 				}
-				if(j == 2) break;
+				if(j == 2) break; //if both links are found, stop looking
 			}
 			++itc; ++itl;
 		}
@@ -103,8 +114,8 @@ namespace alex {
 		*/
 		if(sequence[start]) sign = 1.0;
 		else sign = -1.0;
-		a = get_integer(sequence, start+1); 
-		b = get_integer(sequence, start+9); //8-bit integers
+		a = get_integer<N>(sequence, start+1); 
+		b = get_integer<N>(sequence, start+9); //8-bit integers
 		return sign*a/(1.0 + b); 
 	} //get_real
 
@@ -113,23 +124,14 @@ namespace alex {
 		/*
 		Translates an 8-bit portion of a bit sequence to an integer. The integers are
 		coded in the genome with Gray's coding, which hopefully improves the fitness
-		surface by smoothing it out. 
+		surface by smoothing it out. This method may segfault if the sequence isn't long
+		enough (there is no bounds checking).
 		*/
-		std::bitset<8> integer = get_subset<N,8>(sequence, start);
+		std::bitset<8> integer;
+		unsigned int i=start, j=0;
+		for(i, j; i<(start+8); ++i, ++j) integer[j] = sequence[i];
 		return gray_to_binary( integer.to_ulong() );
 	} //get_integer
-	
-	template<unsigned int N, unsigned int M>
-	std::bitset<M> Phenotype::get_subset(std::bitset<M>& sequence, unsigned int start) const {
-		/*
-		Extracts a contiguous subset from a bit sequence. May segfault if sequence
-		isn't long enough (there is no bounds checking). 
-		*/
-		std::bitset<M> subset;
-		unsigned int i=start, j=0;
-		for(i, j; i<(start+M); ++i, ++j) subset[j] = sequence[i];
-		return subset;
-	} //get_subset
 	
 	unsigned long gray_to_binary(unsigned long num) const {
 		/*
