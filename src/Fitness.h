@@ -22,11 +22,18 @@
 */
 
 #include <map>
+#include <vector>
 
 namespace alex {
 
 	template<unsigned int N, unsigned int I, unsigned int O>
 	class Fitness {
+	/*
+		A Fitness object is necessary to manage the various Genotypes in a 
+		population. Its main function is to decide which two existing Genotypes 
+		will serve as parents for a new Genotype. This decision is made with
+		probabilities weighted by the value of each Genotype. 
+	*/
 	private:
 		map<unsigned int, Genotype<N,I,O>*> population;
 		std::minstd_rand generator; //for choosing individuals for breeding

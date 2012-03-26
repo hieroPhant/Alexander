@@ -26,6 +26,16 @@ namespace alex {
 	class Organism;
 
 	class Neurocyte : public Neuron_base {
+	/*
+		The Neurocyte class inherits ben::Nodes from Neuron_base. It adds
+		to this most of the processing done by the network (link-centric
+		calculations excluded). This means activation functions, backprop,
+		information theory calcutions, and topological adaptation. The 
+		activation function and its derivative are pure virtual, meant to be
+		defined by small child classes that do little else. Neurocytes are
+		stored and managed by an Organism object, and each Neurocyte stores
+		a pointer to its owning Organism. 
+	*/
 	private:
 		data_type state;
 		Organism* pOrganism;

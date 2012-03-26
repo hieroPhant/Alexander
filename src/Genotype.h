@@ -34,6 +34,15 @@ namespace alex {
 	//O is # of non-boolean outputs from the network
 	template<unsigned int N=5, unsigned int I=3, unsigned int O=7> 
 	class Genotype {
+	/*
+		Genotype stores a neuron's genome and associates it with the neuron's value
+		(the value is used as a measure of evolutionary fitness). Genotypes also store
+		a pointer to the Fitness object that coordinates the population. The major work
+		is done in the constructors: the default constructor generates a random genome, 
+		and the second constructor performs crossover and mutation from two parents. The
+		Phenotype class has private access in order to parse the genome. 
+		
+	*/
 	private:
 		Fitness<N>* fitness;
 		//17 bit numbers, K=2 connectivity

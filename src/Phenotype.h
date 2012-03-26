@@ -22,11 +22,18 @@
 */
 
 #include <random>
+#include <array>
 #include <bitset>
 
 namespace alex {
 
 	class Phenotype {
+	/*
+		This class parses the genome (stored in Genotype) into a genetic switching 
+		network, runs that network, and stores the resulting learning parameters. 
+		Parsing is done in the constructor. The run() method steps the gene network
+		forward one step and recalculates the learning parameters. 
+	*/
 	private:
 		//unsigned long binary_to_gray(unsigned long num) { return (num>>1) ^ num; }
 		unsigned long gray_to_binary(unsigned long num);

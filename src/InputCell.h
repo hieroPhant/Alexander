@@ -41,7 +41,7 @@ namespace alex {
 			{ output = signal;	distribute_signals(); }
 	}; //class InputCell
 	
-	InputCell::InputCell(forward_index_type&   fIndex, backprop_index_type&  bIndex) 
+	InputCell::InputCell(forward_index_type& fIndex, backprop_index_type& bIndex) 
 		: Neuron_base(fIndex, bIndex, iIndex, 0.0, false) {}
 	
 	InputCell::InputCell(InputCell&& rhs)

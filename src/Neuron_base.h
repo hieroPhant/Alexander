@@ -26,6 +26,27 @@
 namespace alex {
 
 	class Neuron_base {
+	/*
+		The Neuron_base class is responsible for managing the various 
+		ben::Node objects used by a neuron to communicate with other 
+		neurons. The forward_node network transmits signals forward as
+		the network evaluates, the backprop_node transmits gradients
+		backward, and the info_node transmits information-theoretic value.
+		Neuron_base includes public methods for managing links and protected
+		utility methods for use by child classes. 
+		
+		This class handles the forward input function (dot product), but 
+		not the activation function. Most every neuron will need to store 
+		its forward output value for training, so this is included as a member. 
+		Weight deltas are stored as the weights of the backward network, so 
+		Neuron_base has enough data to provide a utility to update weights. 
+		
+		Note: Neuron_base will need to get the learning_rate, etc. from the
+		Phenotype class, but the latter is a member of the Neurocyte class...
+		
+		Note: Is the Value pointer necessary anymore, since I have decided to 
+		compute mutual information incrementally based on boolean frequency? 
+	*/
 	protected:
 		forward_node_type   forward_node; //FIELD
 		backprop_node_type  backprop_node; //FIELD

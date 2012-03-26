@@ -28,6 +28,12 @@
 namespace alex {
 	
 	class Organism {
+	/*
+		Organism manages and contains a living network. It has a ben::Index object
+		for each of the three overlaid networks and a Fitness object to mediate 
+		between Genotypes. It has separate storage for input cells (static), output
+		cells (static), and hidden cells (dynamic). 
+	*/
 	private:
 		//cells
 		std::list<InputCell> inputs;
