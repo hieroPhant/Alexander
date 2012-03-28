@@ -1,5 +1,5 @@
-#ifndef Neurocyte_sigmoid_h
-#define Neurocyte_sigmoid_h
+#ifndef Neuron_sigmoid_h
+#define Neuron_sigmoid_h
 
 /*
     Alexander: a neural networks library
@@ -26,7 +26,7 @@
 
 namespace alex {
 
-	class Neurocyte_sigmoid : public Neurocyte {
+	class Neuron_sigmoid : public Neurocyte {
 	private:
 		virtual data_type f(const data_type z) const;
 		virtual gradient_type df(const data_type z) const;
@@ -36,33 +36,33 @@ namespace alex {
 		
 	public:
 		//constructors need work
-		Neurocyte_sigmoid() = delete;
-		Neurocyte_sigmoid(forward_index_type& fIndex, backprop_index_type& bIndex);
-		Neurocyte_sigmoid(const Neurocyte_sigmoid& rhs) = default;
-		Neurocyte_sigmoid(Neurocyte_sigmoid&& rhs);
-		Neurocyte_sigmoid& operator=(const Neurocyte_sigmoid& rhs) = default;
-		Neurocyte_sigmoid& operator=(Neurocyte_sigmoid&& rhs) = delete;
-		~Neurocyte_sigmoid() = default;
+		Neuron_sigmoid() = delete;
+		Neuron_sigmoid(forward_index_type& fIndex, backprop_index_type& bIndex);
+		Neuron_sigmoid(const Neuron_sigmoid& rhs) = default;
+		Neuron_sigmoid(Neuron_sigmoid&& rhs);
+		Neuron_sigmoid& operator=(const Neuron_sigmoid& rhs) = default;
+		Neuron_sigmoid& operator=(Neuron_sigmoid&& rhs) = delete;
+		~Neuron_sigmoid() = default;
 		
 		virtual void act_on_topology();
 		
-	}; //class Neurocyte_sigmoid
+	}; //class Neuron_sigmoid
 	
-	Neurocyte_sigmoid::Neurocyte_sigmoid(forward_index_type& fIndex, backprop_index_type& bIndex) 
+	Neuron_sigmoid::Neuron_sigmoid(forward_index_type& fIndex, backprop_index_type& bIndex) 
 		: Neuron_base("o", fIndex, bIndex, 0.0) {}
 	
-	Neurocyte_sigmoid::Neurocyte_sigmoid(Neurocyte_sigmoid&& rhs)
+	Neuron_sigmoid::Neuron_sigmoid(Neuron_sigmoid&& rhs)
 		: Neuron_base(std::move(rhs.Neuron_base)) {}
 	
-	data_type Neurocyte_sigmoid::f(const data_type z) const 
+	data_type Neuron_sigmoid::f(const data_type z) const 
 		{ return 1/(1 + exp(-state)); }
 	
-	gradient_type Neurocyte_sigmoid::df(const data_type z) const {
+	gradient_type Neuron_sigmoid::df(const data_type z) const {
 		data_type x = exp(z);
 		return x/((x+1)*(x+1));
 	}
 	
-	void Neurocyte_sigmoid::act_on_topology() {
+	void Neuron_sigmoid::act_on_topology() {
 	
 	}
 	

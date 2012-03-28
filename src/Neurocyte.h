@@ -58,7 +58,7 @@ namespace alex {
 			: Neuron_base(rhs), state(rhs.state), output(rhs.output), 
 			  pvalue_matrix(rhs.pvalue_matrix) {}
 		Neurocyte& operator=(const Neurocyte& rhs) = delete;
-		~Neurocyte() = default; "uusfdg"
+		~Neurocyte() = default; 
 		
 		void fire();
 		void train();

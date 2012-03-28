@@ -1,5 +1,5 @@
-#ifndef Neurocyte_linear_h
-#define Neurocyte_linear_h
+#ifndef Neuron_linear_h
+#define Neuron_linear_h
 
 /*
     Alexander: a neural networks library
@@ -23,34 +23,34 @@
 
 namespace alex {
 
-	class Neurocyte_linear : public Neurocyte {
+	class Neuron_linear : public Neurocyte {
 	private:
 		virtual data_type f(const data_type z) const;
 		virtual gradient_type df(const data_type z) const;
 		
 	public:
 		//constructors need work
-		Neurocyte_linear() = delete;
-		Neurocyte_linear(forward_index_type& fIndex, backprop_index_type& bIndex);
-		Neurocyte_linear(const Neurocyte_linear& rhs) = default;
-		Neurocyte_linear(Neurocyte_linear&& rhs);
-		Neurocyte_linear& operator=(const Neurocyte_linear& rhs) = default;
-		Neurocyte_linear& operator=(Neurocyte_linear&& rhs) = delete;
-		~Neurocyte_linear() = default;
+		Neuron_linear() = delete;
+		Neuron_linear(forward_index_type& fIndex, backprop_index_type& bIndex);
+		Neuron_linear(const Neuron_linear& rhs) = default;
+		Neuron_linear(Neuron_linear&& rhs);
+		Neuron_linear& operator=(const Neuron_linear& rhs) = default;
+		Neuron_linear& operator=(Neuron_linear&& rhs) = delete;
+		~Neuron_linear() = default;
 		
 		virtual void act_on_topology() {}
-	}; //class Neurocyte_linear
+	}; //class Neuron_linear
 	
-	Neurocyte_linear::Neurocyte_linear(forward_index_type& fIndex, backprop_index_type& bIndex) 
+	Neuron_linear::Neuron_linear(forward_index_type& fIndex, backprop_index_type& bIndex) 
 		: Neuron_base("o", fIndex, bIndex, 0.0) {}
 	
-	Neurocyte_linear::Neurocyte_linear(Neurocyte_linear&& rhs)
+	Neuron_linear::Neuron_linear(Neuron_linear&& rhs)
 		: Neuron_base(std::move(rhs.Neuron_base)) {}
 	
-	data_type Neurocyte_linear::f(const data_type z) const 
+	data_type Neuron_linear::f(const data_type z) const 
 		{ return z; }
 	
-	gradient_type Neurocyte_linear::df(const data_type z) const 
+	gradient_type Neuron_linear::df(const data_type z) const 
 		{ return 1.0; }
 	
 } //namespace alex

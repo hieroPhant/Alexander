@@ -1,5 +1,5 @@
-#ifndef InputCell_h
-#define InputCell_h
+#ifndef Neuron_input_h
+#define Neuron_input_h
 
 /*
     Alexander: a neural networks library
@@ -23,28 +23,28 @@
 
 namespace alex {
 
-	class InputCell : public Neuron_base {	
+	class Neuron_input : public Neuron_base {	
 	public:
-		InputCell() = delete;
-		InputCell(forward_index_type& fIndex, 
+		Neuron_input() = delete;
+		Neuron_input(forward_index_type& fIndex, 
 			  backprop_index_type& bIndex,
 			  information_index_type& iIndex);
-		InputCell(const InputCell& rhs) = default;
-		InputCell(InputCell&& rhs);
-		InputCell& operator=(const InputCell& rhs) = default;
-		InputCell& operator=(InputCell&& rhs) = delete;
-		~InputCell() = default;
+		Neuron_input(const Neuron_input& rhs) = default;
+		Neuron_input(Neuron_input&& rhs);
+		Neuron_input& operator=(const Neuron_input& rhs) = default;
+		Neuron_input& operator=(Neuron_input&& rhs) = delete;
+		~Neuron_input() = default;
 		
 		gradient_type take_gradient()
 			{ return collect_errors(); }
 		void feed_signal(const data_type signal)
 			{ output = signal;	distribute_signals(); }
-	}; //class InputCell
+	}; //class Neuron_input
 	
-	InputCell::InputCell(forward_index_type& fIndex, backprop_index_type& bIndex) 
+	Neuron_input::Neuron_input(forward_index_type& fIndex, backprop_index_type& bIndex) 
 		: Neuron_base(fIndex, bIndex, iIndex, 0.0, false) {}
 	
-	InputCell::InputCell(InputCell&& rhs)
+	Neuron_input::Neuron_input(Neuron_input&& rhs)
 		: Neuron_base(std::move(rhs.Neuron_base)) {}
 	
 } //namespace alex
