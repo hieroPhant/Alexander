@@ -26,13 +26,10 @@
 
 namespace alex {
 
-	class Neuron_sigmoid : public Neurocyte {
+	class Neuron_sigmoid : public Neuron_base {
 	private:
 		virtual data_type f(const data_type z) const;
-		virtual gradient_type df(const data_type z) const;
-		
-		Genotype genome;
-		Phenotype phenotype;
+		virtual data_type df(const data_type z) const;
 		
 	public:
 		//constructors need work
@@ -43,13 +40,10 @@ namespace alex {
 		Neuron_sigmoid& operator=(const Neuron_sigmoid& rhs) = default;
 		Neuron_sigmoid& operator=(Neuron_sigmoid&& rhs) = delete;
 		~Neuron_sigmoid() = default;
-		
-		virtual void act_on_topology();
-		
 	}; //class Neuron_sigmoid
 	
 	Neuron_sigmoid::Neuron_sigmoid(forward_index_type& fIndex, backprop_index_type& bIndex) 
-		: Neuron_base("o", fIndex, bIndex, 0.0) {}
+		: Neuron_base(fIndex, bIndex, 0.0) {}
 	
 	Neuron_sigmoid::Neuron_sigmoid(Neuron_sigmoid&& rhs)
 		: Neuron_base(std::move(rhs.Neuron_base)) {}
@@ -57,13 +51,9 @@ namespace alex {
 	data_type Neuron_sigmoid::f(const data_type z) const 
 		{ return 1/(1 + exp(-state)); }
 	
-	gradient_type Neuron_sigmoid::df(const data_type z) const {
+	data_type Neuron_sigmoid::df(const data_type z) const {
 		data_type x = exp(z);
 		return x/((x+1)*(x+1));
-	}
-	
-	void Neuron_sigmoid::act_on_topology() {
-	
 	}
 	
 } //namespace alex

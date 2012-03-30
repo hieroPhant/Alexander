@@ -24,31 +24,23 @@
 #include "Benoit.h"
 
 namespace alex {
+
+	typedef unsigned int				ID_type;
+
 	//forward connections
 	typedef float 					data_type; 
 	typedef ben::Node<data_type, data_type> 	forward_node_type;
 	typedef ben::Index<data_type, data_type> 	forward_index_type;
 	
 	//backpropagation connections
-	typedef data_type 				gradient_type; 
 	typedef std::pair<data_type,bool> 		delta_type; 
 	typedef ben::Node<delta_type, gradient_type> 	backprop_node_type;
 	typedef ben::Index<delta_type, gradient_type> 	backprop_index_type;
 	
-	//information-theoretic connections
-	typedef float 					info_type;
-	typedef ben::Node<info_type, info_type> 	info_node_type; 
-	typedef ben::Index<info_type, info_type> 	info_index_type;
-	
 } //namespace alex
 
-#include "PDF.h"
-#include "Value.h"
-#include "Genotype.h" //forward declares class Fitness
-#include "Fitness.h"
-#include "Phenotype.h"
 #include "Neuron_base.h"
-#include "Neurocyte.h" 	//forward declares class Organism
+#include "Neurocyte.h" 
 #include "Neurocyte_linear.h"
 #include "Neurocyte_sigmoid.h"
 #include "InputCell.h"

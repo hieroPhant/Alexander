@@ -50,24 +50,22 @@ namespace alex {
 	protected:
 		forward_node_type   forward_node; //FIELD
 		backprop_node_type  backprop_node; //FIELD
-		information_node_type info_node; //FIELD
 		
-		Value* pValue; //FIELD
-		data_type output;
+		data_type state, output; //FIELD
 		
 		//Node-related utility methods
-		data_type collect_signals();
-		void distribute_signals(const data_type output);
-		gradient_type collect_errors();
-		void distribute_errors(const gradient_type gradient);
-		info_type collect_value();
-		void distribute_value();
+		virtual void collect_signals();
+		void distribute_signals();
+		data_type collect_errors();
+		virtual void distribute_errors(const data_type gradient);
+		
+		virtual data_type f(const data_type z) = 0;
+		virtual data_type df(const data_type z) = 0;
 		
 	public:
 		Neuron_base() = default;
 		Neuron_base(forward_index_type&   fIndex, 
 			    backprop_index_type&  bIndex,
-			    information_index_type& iIndex,
 			    const data_type bias=0.0,
 			    const bool trainable=true);
 		Neuron_base(const Neuron_base& rhs);
@@ -76,15 +74,17 @@ namespace alex {
 		Neuron_base& operator=(Neuron_base&& rhs) = delete;
 		virtual ~Neuron_base() = default;
 		
+		void fire();
+		void train();
+		
 		void update_weights();
 
-		void add_input(	const unsigned int address, const data_type weight, 
+		void add_input(	const ID_type address, const data_type weight, 
 				const bool trainable=true);
-		void remove_input(const unsigned int address); 
-		void connect_info(const unsigned int address);
+		void remove_input(const ID_type address); 
 		
 		void clear();
-		unsigned int ID() const { return forward.ID; }
+		ID_type ID() const { return forward.ID; }
 	}; //class Neuron_base
 
 } //namespace alex

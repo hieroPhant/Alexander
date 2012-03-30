@@ -23,19 +23,24 @@
 
 namespace alex {
 
-	class Neuron_input : public Neuron_base {	
+	class Neuron_input : public Neuron_base {
+	protected:
+		virtual data_type f(const data_type z) {}
+		virtual data_type df(const data_type z) {}
+		
 	public:
 		Neuron_input() = delete;
 		Neuron_input(forward_index_type& fIndex, 
-			  backprop_index_type& bIndex,
-			  information_index_type& iIndex);
+			  backprop_index_type& bIndex);
 		Neuron_input(const Neuron_input& rhs) = default;
 		Neuron_input(Neuron_input&& rhs);
 		Neuron_input& operator=(const Neuron_input& rhs) = default;
 		Neuron_input& operator=(Neuron_input&& rhs) = delete;
 		~Neuron_input() = default;
 		
-		gradient_type take_gradient()
+		//need a way to hide fire() and train()?
+		
+		data_type take_gradient()
 			{ return collect_errors(); }
 		void feed_signal(const data_type signal)
 			{ output = signal;	distribute_signals(); }
