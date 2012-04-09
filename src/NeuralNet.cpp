@@ -19,38 +19,7 @@
 */
 
 #include "Alexander.h"
-#include <cmath>
 
 namespace alex {
-	
-	void Neurocyte::fire() {
-		//collect input signals
-		auto ip = forward_node.input_begin();
-		auto ipe = forward_node.input_begin();
-		while(ip != ipe) {
-			ip >> signal;
-			//add to pdf
-			state += ip->weight * signal;
-			++ip;
-		}
-		
-		//update joint distributions and output distribution (self-information)
-		
-		output = f(state);
-		distribute_signals(output);
-	}
-	
-	void Neurocyte::train() {
-		//topology training
-		value = collect_value();
-		distribute_value();
-		
-		//weight and bias training
-		auto input_sum = collect_errors();
-		gradient_type gradient = input_sum * df(state);
-		backprop_node.bias = -learning_rate*gradient + momentum*backprop_node.bias;
-		distribute_errors(gradient);
-	}
-	
-} //namespace alex
 
+} //namespace alex

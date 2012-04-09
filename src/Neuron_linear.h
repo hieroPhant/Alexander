@@ -43,7 +43,7 @@ namespace alex {
 		: Neuron_base(fIndex, bIndex, 0.0) {}
 	
 	Neuron_linear::Neuron_linear(Neuron_linear&& rhs)
-		: Neuron_base(std::move(rhs.Neuron_base)) {}
+		: Neuron_base( std::move(rhs) ) {}
 	
 	data_type Neuron_linear::f(const data_type z) const 
 		{ return z; }

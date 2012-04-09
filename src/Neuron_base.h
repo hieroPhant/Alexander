@@ -72,7 +72,7 @@ namespace alex {
 		Neuron_base(Neuron_base&& rhs);
 		Neuron_base& operator=(const Neuron_base& rhs);
 		Neuron_base& operator=(Neuron_base&& rhs) = delete;
-		virtual ~Neuron_base() = default;
+		virtual ~Neuron_base();
 		
 		void fire();
 		void train();
@@ -84,7 +84,7 @@ namespace alex {
 		void remove_input(const ID_type address); 
 		
 		void clear();
-		ID_type ID() const { return forward.ID; }
+		ID_type ID() const { return forward_node.ID; }
 	}; //class Neuron_base
 
 } //namespace alex

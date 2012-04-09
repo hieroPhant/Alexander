@@ -18,12 +18,13 @@
     e-mail: jackwhall7@gmail.com
 */
 
+//g++ -Wall -std=c++0x -fPIC -I../Benoit/src -oNeuron_base.o Neuron_base.cpp
+
 #include "Alexander.h"
 
 namespace alex {
 	
-
-	Neuron_base::Neuron_base(forward_node_index_type& fIndex,
+	Neuron_base::Neuron_base(forward_index_type& fIndex,
 				 backprop_index_type& bIndex,
 				 const data_type bias, 
 				 const bool trainable) 
@@ -38,10 +39,13 @@ namespace alex {
 		: forward_node( std::move(rhs.forward_node) ), 
 		  backprop_node( std::move(rhs.backprop_node) ) {} //move ctor
 		  
-	Neuron_base::Neuron_base& operator=(const Neuron_base& rhs) { 
+	Neuron_base& Neuron_base::operator=(const Neuron_base& rhs) { 
 		forward_node = rhs.forward_node;
 		backprop_node = rhs.backprop_node;
+		return *this;
 	} 
+	
+	Neuron_base::~Neuron_base() = default;
 	
 	void Neuron_base::collect_signals() {
 		//computes the dot product between weights and incoming signals,
@@ -84,43 +88,21 @@ namespace alex {
 	void Neuron_base::distribute_errors(const data_type gradient) {
 		//calculates gradient for both weights and signals,
 		//transmitting the latter backward
-		
-		//skip frozen weights here, or in update_weights?
 		auto op = backprop_node.output_begin(); 
 		auto ope = backprop_node.output_end();
 		auto fp = forward_node.input_begin();
 		data_type old_output;
 		while(op != ope) {
 			fp >> old_output; //depends on Link saving old values
-			op->weight->first *= momentum;
-			op->weight->first += -learning_rate * gradient * old_output;
+			if(op->weight.second) {
+				//when to multiply by momentum?
+				op->weight.first *= momentum;
+				op->weight.first -= learning_rate * gradient * old_output;
+			}
 			op << gradient * fp->weight;
 			++op;
 		}
 	}
-	
-/*	info_type Neuron_base::collect_value() {
-		auto ip = info_node.input_begin();
-		auto ipe = info_node.input_end();
-		info_type link_value, neuron_value = 0;
-		while(ip != ipe) {
-			op >> link_value;
-			neuron_value += link_value;
-			++ip;
-		}
-		return neuron_value;
-	}
-	
-	void Neuron_base::distribute_value() {
-		auto op = info_node.output_begin();
-		auto ope = info_node.output.end();
-		while(op != ope) {
-			if(op->weight->second) {
-				//calculate value from mutual information
-			}
-			++op;
-		}
-	}*/
 	
 	void Neuron_base::fire() {
 		collect_signals();
@@ -140,20 +122,17 @@ namespace alex {
 	}
 	
 	void Neuron_base::update_weights() {
-	//skip frozen weights here, or in distribute_errors()?
-	//am I multiplying by the learning rate twice?
 		if(backprop_node.bias->second) {
 			forward_node.bias += backprop_node.bias->first;
 			backprop_node.bias->first = 0.0;	
 		}
-	
+		
 		auto fp = forward_node.input_begin();
 		auto fpe = forward_node.input_end();
 		auto bp = backprop_node.output_begin();
 		while(fp != fpe) {
 			if(bp->weight->second) {
-				fp->weight += learning_rate * bp->weight->first;
-				bp->weight->first = 0.0;
+				fp->weight += bp->weight->first;
 			}
 			++fp;
 			++bp;

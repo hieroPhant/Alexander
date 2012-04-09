@@ -24,9 +24,11 @@
 namespace alex {
 
 	class Neuron_input : public Neuron_base {
-	protected:
-		virtual data_type f(const data_type z) {}
-		virtual data_type df(const data_type z) {}
+	private:
+		virtual data_type f(const data_type z) { return 0.0; }
+		virtual data_type df(const data_type z) { return 0.0; }
+		void fire();
+		void train();
 		
 	public:
 		Neuron_input() = delete;
@@ -38,8 +40,6 @@ namespace alex {
 		Neuron_input& operator=(Neuron_input&& rhs) = delete;
 		~Neuron_input() = default;
 		
-		//need a way to hide fire() and train()?
-		
 		data_type take_gradient()
 			{ return collect_errors(); }
 		void feed_signal(const data_type signal)
@@ -47,10 +47,10 @@ namespace alex {
 	}; //class Neuron_input
 	
 	Neuron_input::Neuron_input(forward_index_type& fIndex, backprop_index_type& bIndex) 
-		: Neuron_base(fIndex, bIndex, iIndex, 0.0, false) {}
+		: Neuron_base(fIndex, bIndex, 0.0, false) {}
 	
 	Neuron_input::Neuron_input(Neuron_input&& rhs)
-		: Neuron_base(std::move(rhs.Neuron_base)) {}
+		: Neuron_base( std::move(rhs) ) {}
 	
 } //namespace alex
 

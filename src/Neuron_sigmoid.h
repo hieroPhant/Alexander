@@ -21,8 +21,6 @@
     e-mail: jackwhall7@gmail.com
 */
 #include <cmath>
-#include "Genotype.h"
-#include "Phenotype.h"
 
 namespace alex {
 
@@ -46,7 +44,7 @@ namespace alex {
 		: Neuron_base(fIndex, bIndex, 0.0) {}
 	
 	Neuron_sigmoid::Neuron_sigmoid(Neuron_sigmoid&& rhs)
-		: Neuron_base(std::move(rhs.Neuron_base)) {}
+		: Neuron_base( std::move(rhs) ) {}
 	
 	data_type Neuron_sigmoid::f(const data_type z) const 
 		{ return 1/(1 + exp(-state)); }

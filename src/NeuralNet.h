@@ -1,5 +1,5 @@
-#ifndef Alexander_h
-#define Alexander_h
+#ifndef NeuralNet_h
+#define NeuralNet_h
 
 /*
     Alexander: a neural networks library
@@ -21,30 +21,13 @@
     e-mail: jackwhall7@gmail.com
 */
 
-#include <utility>
-#include "Benoit.h"
-
 namespace alex {
 
-	typedef unsigned int				ID_type;
+	class NeuralNet {
+	
+	
+	}; //class NeuralNet
 
-	//forward connections
-	typedef float 					data_type; 
-	typedef ben::Node<data_type, data_type> 	forward_node_type;
-	typedef ben::Index<data_type, data_type> 	forward_index_type;
-	
-	//backpropagation connections
-	typedef std::pair<data_type,bool> 		delta_type; 
-	typedef ben::Node<delta_type, data_type> 	backprop_node_type;
-	typedef ben::Index<delta_type, data_type> 	backprop_index_type;
-	
 } //namespace alex
 
-#include "Neuron_base.h"
-#include "Neuron_input.h"
-#include "Neuron_linear.h"
-#include "Neuron_sigmoid.h"
-#include "NeuralNet.h"
-
 #endif
-
