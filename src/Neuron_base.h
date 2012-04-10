@@ -52,8 +52,9 @@ namespace alex {
 		forward_node_type   forward_node; //FIELD
 		backprop_node_type  backprop_node; //FIELD
 		
+		//may need to store multiple values for backprop-through-time
 		data_type state, output; //FIELD
-		data_type learning_rate, momentum; //FIELD
+		data_type learning_rate, momentum; //FIELD, need set functions for both
 		
 		//Node-related utility methods
 		virtual void collect_signals();
@@ -76,9 +77,12 @@ namespace alex {
 		Neuron_base& operator=(Neuron_base&& rhs) = delete;
 		virtual ~Neuron_base();
 		
-		void fire();
-		void train();
+		data_type fire();
+		void train( data_type gradient=collect_errors() );
 		
+		data_type get_output() const { return output; }
+		
+		void set_rates(const data_type rate, const data_type factor);
 		void update_weights();
 
 		void add_input(	const ID_type address, const data_type weight, 

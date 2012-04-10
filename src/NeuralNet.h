@@ -28,6 +28,10 @@
 namespace alex {
 
 	class NeuralNet {
+	/*
+		Using pugixml for XML parsing (network topology data is stored in XML)
+	*/
+	
 	protected:
 		std::vector<Neuron_input> input_layer;
 		std::list< std::vector<Neuron_base> > hidden_layers;
@@ -39,13 +43,15 @@ namespace alex {
 	public:
 		NeuralNet() = default;
 		NeuralNet(const NeuralNet& rhs) = delete;
-		//NeuralNet(NeuralNet&& rhs);
+		NeuralNet(NeuralNet&& rhs);
 		NeuralNet& operator=(const NeuralNet& rhs) = delete;
-		//NeuralNet& operator=(NeuralNet&& rhs);
+		NeuralNet& operator=(NeuralNet&& rhs);
 		virtual ~NeuralNet();
 		
 		void run();
 		void backpropagate();
+		
+		bool build_network(); //argument for filename here, call pugixml
 	
 	}; //class NeuralNet
 

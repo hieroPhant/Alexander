@@ -18,7 +18,7 @@
     e-mail: jackwhall7@gmail.com
 */
 
-//g++ -Wall -std=c++0x -fPIC -I../Benoit/src -oNeuron_base.o Neuron_base.cpp
+//g++ -std=c++0x -fPIC -I../Benoit/src -oNeuron_base.o Neuron_base.cpp
 
 #include "Neuron_base.h"
 
@@ -33,15 +33,27 @@ namespace alex {
 	
 	Neuron_base::Neuron_base(const Neuron_base& rhs) 
 		: forward_node(rhs.forward_node), 
-		  backprop_node(rhs.backprop_node, forward_node.ID) {} //copy constructor
+		  backprop_node(rhs.backprop_node, forward_node.ID),
+		  state(rhs.state), 
+		  output(rhs.output),
+		  learning_rate(rhs.learning_rate),
+		  momentum(rhs.momentum) {} //copy constructor
 	
 	Neuron_base::Neuron_base(Neuron_base&& rhs) 
 		: forward_node( std::move(rhs.forward_node) ), 
-		  backprop_node( std::move(rhs.backprop_node) ) {} //move ctor
+		  backprop_node( std::move(rhs.backprop_node) ),
+		  state(rhs.state), 
+		  output(rhs.output),
+		  learning_rate(rhs.learning_rate),
+		  momentum(rhs.momentum) {} //move ctor
 		  
 	Neuron_base& Neuron_base::operator=(const Neuron_base& rhs) { 
 		forward_node = rhs.forward_node;
 		backprop_node = rhs.backprop_node;
+		state = rhs.state;
+		output = rhs.output;
+		learning_rate = rhs.learning_rate;
+		momentum = rhs.momentum;
 		return *this;
 	} 
 	
@@ -108,10 +120,10 @@ namespace alex {
 		collect_signals();
 		output = f(state);
 		distribute_signals();
+		return output;
 	}
 	
-	void Neuron_base::train() {
-		data_type gradient = collect_errors();
+	void Neuron_base::train(data_type gradient) {
 		gradient *= df(state);
 		
 		//update bias delta
@@ -119,6 +131,11 @@ namespace alex {
 		backprop_node.bias.first += -learning_rate * gradient;
 		
 		distribute_errors(gradient);
+	}
+	
+	void Neuron_base::set_rates(const data_type rate, const data_type factor) {
+		learning_rate = rate;
+		momentum = momen;
 	}
 	
 	void Neuron_base::update_weights() {
