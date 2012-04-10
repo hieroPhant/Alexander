@@ -21,6 +21,8 @@
     e-mail: jackwhall7@gmail.com
 */
 
+#include "Neuron_base.h"
+
 namespace alex {
 
 	class Neuron_input : public Neuron_base {
@@ -45,12 +47,6 @@ namespace alex {
 		void feed_signal(const data_type signal)
 			{ output = signal;	distribute_signals(); }
 	}; //class Neuron_input
-	
-	Neuron_input::Neuron_input(forward_index_type& fIndex, backprop_index_type& bIndex) 
-		: Neuron_base(fIndex, bIndex, 0.0, false) {}
-	
-	Neuron_input::Neuron_input(Neuron_input&& rhs)
-		: Neuron_base( std::move(rhs) ) {}
 	
 } //namespace alex
 

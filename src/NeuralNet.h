@@ -21,10 +21,31 @@
     e-mail: jackwhall7@gmail.com
 */
 
+#include <vector>
+#include <list>
+#include "Alexander.h"
+
 namespace alex {
 
 	class NeuralNet {
-	
+	protected:
+		std::vector<Neuron_input> input_layer;
+		std::list< std::vector<Neuron_base> > hidden_layers;
+		std::vector<Neuron_base> output_layer;
+		
+		forward_index_type forward_index;
+		backprop_index_type backprop_index;
+		
+	public:
+		NeuralNet() = default;
+		NeuralNet(const NeuralNet& rhs) = delete;
+		//NeuralNet(NeuralNet&& rhs);
+		NeuralNet& operator=(const NeuralNet& rhs) = delete;
+		//NeuralNet& operator=(NeuralNet&& rhs);
+		virtual ~NeuralNet();
+		
+		void run();
+		void backpropagate();
 	
 	}; //class NeuralNet
 

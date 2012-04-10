@@ -18,8 +18,18 @@
     e-mail: jackwhall7@gmail.com
 */
 
-#include "Alexander.h"
+#include "NeuralNet.h"
 
 namespace alex {
+
+	NeuralNet::~NeuralNet() = default;
+	
+	void NeuralNet::run() {
+	
+	}
+	
+	void NeuralNet::backpropagate() {
+	
+	}
 
 } //namespace alex

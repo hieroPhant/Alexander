@@ -20,7 +20,7 @@
 
 //g++ -Wall -std=c++0x -fPIC -I../Benoit/src -oNeuron_base.o Neuron_base.cpp
 
-#include "Alexander.h"
+#include "Neuron_base.h"
 
 namespace alex {
 	
@@ -115,24 +115,24 @@ namespace alex {
 		gradient *= df(state);
 		
 		//update bias delta
-		backprop_node.bias->first *= momentum;
-		backprop_node.bias->first += -learning_rate * gradient;
+		backprop_node.bias.first *= momentum;
+		backprop_node.bias.first += -learning_rate * gradient;
 		
 		distribute_errors(gradient);
 	}
 	
 	void Neuron_base::update_weights() {
-		if(backprop_node.bias->second) {
-			forward_node.bias += backprop_node.bias->first;
-			backprop_node.bias->first = 0.0;	
+		if(backprop_node.bias.second) {
+			forward_node.bias += backprop_node.bias.first;
+			backprop_node.bias.first = 0.0;	
 		}
 		
 		auto fp = forward_node.input_begin();
 		auto fpe = forward_node.input_end();
 		auto bp = backprop_node.output_begin();
 		while(fp != fpe) {
-			if(bp->weight->second) {
-				fp->weight += bp->weight->first;
+			if(bp->weight.second) {
+				fp->weight += bp->weight.first;
 			}
 			++fp;
 			++bp;

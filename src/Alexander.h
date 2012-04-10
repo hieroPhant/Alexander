@@ -40,11 +40,13 @@ namespace alex {
 	
 } //namespace alex
 
+#ifndef Neuron_base_h
 #include "Neuron_base.h"
 #include "Neuron_input.h"
 #include "Neuron_linear.h"
 #include "Neuron_sigmoid.h"
 #include "NeuralNet.h"
+#endif
 
 #endif
 

@@ -21,6 +21,8 @@
     e-mail: jackwhall7@gmail.com
 */
 
+#include "Neuron_base.h"
+
 namespace alex {
 
 	class Neuron_linear : public Neuron_base {
@@ -38,18 +40,6 @@ namespace alex {
 		Neuron_linear& operator=(Neuron_linear&& rhs) = delete;
 		~Neuron_linear() = default;
 	}; //class Neuron_linear
-	
-	Neuron_linear::Neuron_linear(forward_index_type& fIndex, backprop_index_type& bIndex) 
-		: Neuron_base(fIndex, bIndex, 0.0) {}
-	
-	Neuron_linear::Neuron_linear(Neuron_linear&& rhs)
-		: Neuron_base( std::move(rhs) ) {}
-	
-	data_type Neuron_linear::f(const data_type z) const 
-		{ return z; }
-	
-	data_type Neuron_linear::df(const data_type z) const 
-		{ return 1.0; }
 	
 } //namespace alex
 

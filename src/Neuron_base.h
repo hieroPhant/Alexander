@@ -22,6 +22,7 @@
 */
 
 #include <iostream>
+#include "Alexander.h"
 
 namespace alex {
 
@@ -52,6 +53,7 @@ namespace alex {
 		backprop_node_type  backprop_node; //FIELD
 		
 		data_type state, output; //FIELD
+		data_type learning_rate, momentum; //FIELD
 		
 		//Node-related utility methods
 		virtual void collect_signals();

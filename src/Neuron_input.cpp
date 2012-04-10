@@ -1,6 +1,3 @@
-#ifndef Neuron_sigmoid_h
-#define Neuron_sigmoid_h
-
 /*
     Alexander: a neural networks library
     Copyright (C) 2011-2012  Jack Hall
@@ -20,27 +17,16 @@
     
     e-mail: jackwhall7@gmail.com
 */
-#include "Neuron_base.h"
-#include <cmath>
+
+#include "Neuron_input.h"
 
 namespace alex {
 
-	class Neuron_sigmoid : public Neuron_base {
-	private:
-		virtual data_type f(const data_type z) const;
-		virtual data_type df(const data_type z) const;
-		
-	public:
-		//constructors need work
-		Neuron_sigmoid() = delete;
-		Neuron_sigmoid(forward_index_type& fIndex, backprop_index_type& bIndex);
-		Neuron_sigmoid(const Neuron_sigmoid& rhs) = default;
-		Neuron_sigmoid(Neuron_sigmoid&& rhs);
-		Neuron_sigmoid& operator=(const Neuron_sigmoid& rhs) = default;
-		Neuron_sigmoid& operator=(Neuron_sigmoid&& rhs) = delete;
-		~Neuron_sigmoid() = default;
-	}; //class Neuron_sigmoid
+	Neuron_input::Neuron_input(forward_index_type& fIndex, backprop_index_type& bIndex) 
+		: Neuron_base(fIndex, bIndex, 0.0, false) {}
 	
+	Neuron_input::Neuron_input(Neuron_input&& rhs)
+		: Neuron_base( std::move(rhs) ) {}
+		
 } //namespace alex
 
-#endif
