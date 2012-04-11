@@ -42,6 +42,7 @@ namespace alex {
 		
 	public:
 		NeuralNet() = default;
+		explicit NeuralNet(const char* pfilename);
 		NeuralNet(const NeuralNet& rhs) = delete;
 		NeuralNet(NeuralNet&& rhs);
 		NeuralNet& operator=(const NeuralNet& rhs) = delete;

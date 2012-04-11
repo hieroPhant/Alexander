@@ -78,7 +78,8 @@ namespace alex {
 		virtual ~Neuron_base();
 		
 		data_type fire();
-		void train( data_type gradient=collect_errors() );
+		void train(); //delegates to other version (default argument can't use 'this')
+		void train(data_type gradient);
 		
 		data_type get_output() const { return output; }
 		

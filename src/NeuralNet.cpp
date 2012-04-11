@@ -22,6 +22,10 @@
 
 namespace alex {
 	
+	NeuralNet::NeuralNet(const char* pfilename) {
+		build_network(pfilename);
+	}
+	
 	NeuralNet::NeuralNet(NeuralNet&& rhs) 
 		: input_layer( std::move(rhs.input_layer) ),
 		  hidden_layers( std::move(rhs.hidden_layers) ),
@@ -47,13 +51,13 @@ namespace alex {
 		auto iti = input_layer.begin();
 		auto itie = input_layer.end();
 		while(iti != itie) { //each input neuron
-			iti->feed_signal(); //needs an argument and some data
+			//iti->feed_signal(); //needs an argument and some data
 			++iti;
 		}
 		
 		auto ith = hidden_layers.begin();
 		auto ithe = hidden_layers.end();
-		vector<Neuron_base>::iterator itl, itle;
+		std::vector<Neuron_base>::iterator itl, itle;
 		while(ith != ithe) { //each layer
 			itl = ith->begin();
 			itle = ith->end();
@@ -85,7 +89,7 @@ namespace alex {
 		
 		auto ith = hidden_layers.rbegin();
 		auto ithe = hidden_layers.rend();
-		vector<Neuron_base>::iterator itl, itle;
+		std::vector<Neuron_base>::reverse_iterator itl, itle;
 		while(ith != ithe) { //each layer
 			itl = ith->rbegin();
 			itle = ith->rend();
@@ -102,6 +106,12 @@ namespace alex {
 			iti->take_gradient(); //is this necessary? what is being trained?
 			++iti;
 		}
+	}
+	
+	bool NeuralNet::build_network(const char* pfilename) {
+		pugi::xml_document doc;
+		pugi::xml_parse_result result = doc.load_file(*pfilename);
+		
 	}
 
 } //namespace alex

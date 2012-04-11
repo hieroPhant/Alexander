@@ -116,11 +116,15 @@ namespace alex {
 		}
 	}
 	
-	void Neuron_base::fire() {
+	data_type Neuron_base::fire() {
 		collect_signals();
 		output = f(state);
 		distribute_signals();
 		return output;
+	}
+	
+	void Neuron_base::train() {
+		train( collect_errors() );
 	}
 	
 	void Neuron_base::train(data_type gradient) {
@@ -135,7 +139,7 @@ namespace alex {
 	
 	void Neuron_base::set_rates(const data_type rate, const data_type factor) {
 		learning_rate = rate;
-		momentum = momen;
+		momentum = factor;
 	}
 	
 	void Neuron_base::update_weights() {
