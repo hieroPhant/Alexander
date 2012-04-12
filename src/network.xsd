@@ -1,0 +1,21 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/1/XMLSchema">
+
+<xsd:complexType name="network">
+	<xsd:element name="name" 	type="xsd:string"/>
+	<xsd:complexType name="layer" 	minOccurs="2" maxOccurs="unbounded">
+		<xsd:attribute name="number" 	type="xsd:unsignedInt"/>
+		<xsd:complexType name="neuron" 	minOccurs="1" 	maxOccurs="unbounded">
+			<xsd:attribute name="id" 	type="xsd:unsignedInt"/>
+			<xsd:attribute name="type" 	type="xsd:token"/>
+			<xsd:attribute name="bias" 	type="xsd:float"/>
+			<xsd:element name="link" 	minOccurs="0" 	maxOccurs="unbounded">
+				<xsd:attribute name="origin-id" type="xsd:unsignedInt"/>
+				<xsd:attribute name="weight" 	type="xsd:float"/>
+				<xsd:attribute name="trainable" type="xsd:boolean"/>
+			</xsd:element>
+		</xsd:complexType>
+	</xsd:complexType>
+</xsd:complexType>
+
+</xsd:schema>
+

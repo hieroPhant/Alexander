@@ -2,54 +2,25 @@
 
 <network>
 	<name>XOR</name>
-	<layer>
-		<number>1</number>
-		<neuron>
-			<id>1</id>
-			<type>input</type>
-			<inputs></inputs>
-			<weights></weights>
-			<bias>0.0</bias>
-			<outputs>3,4</outputs>
+	<layer number="1">
+		<neuron id="1" type="input"/>
+		<neuron id="2" type="input"/>
+	</layer>
+	<layer number="2">
+		<neuron id="3" type="sigmoid" bias="0.0">
+			<link origin-id="1" weight="1.0" trainable="1"/>
+			<link origin-id="2" weight="-1.0" trainable="1"/>
 		</neuron>
-		<neuron>
-			<id>2</id>
-			<type>input</type>
-			<inputs></inputs>
-			<weights></weights>
-			<bias>0.0</bias>
-			<outputs>3,4</outputs>
+		<neuron id="4" type="sigmoid" bias="1.0">
+			<link origin-id="1" weight="-1.0" trainable="1"/>
+			<link origin-id="2" weight="1.0" trainable="1"/>
 		</neuron>
 	</layer>
-	</layer>
-		<number>2</number>
-		<neuron>
-			<id>3</id>
-			<type>sigmoid</type>
-			<inputs>1,2</inputs>
-			<weights>1,-1</weights>
-			<bias>1.0</bias>
-			<outputs>5</outputs>
-		</neuron>
-		<neuron>
-			<id>4</id>
-			<type>sigmoid</type>
-			<inputs>1,2</inputs>
-			<outputs>5</outputs>
-			<weights>-1,1</weights>
-			<bias>1.0</bias>
-			<outputs>5</outputs>
-		</neuron>
-	</layer>
-	<layer>
-		<number>3</number>
-		<neuron>
-			<id>5</id>
-			<type>linear</type>
-			<inputs>3,4</inputs>
-			<weights>1,1</weights>
-			<bias>1.0</bias>
-			<outputs></outputs>
+	<layer number="3">
+		<neuron id="5" type="sigmoid" bias="1.0">
+			<link origin-id="3" weight="1.0" trainable="1"/>
+			<link origin-id="4" weight="1.0" trainable="1"/>
 		</neuron>
 	</layer>
 </network>
+
