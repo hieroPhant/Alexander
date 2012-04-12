@@ -52,7 +52,7 @@ namespace alex {
 		void run();
 		void backpropagate();
 		
-		bool build_network(); //argument for filename here, call pugixml
+		bool build_network(const char* pfilename); //argument for filename here, call pugixml
 	
 	}; //class NeuralNet
 

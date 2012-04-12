@@ -1,9 +1,11 @@
 CC = g++
-CFLAGS = -std=c++0x -fPIC -g -I../Benoit/src -I/home/jack/Code/pugixml/src
+CFLAGS = -std=c++0x -fPIC -g -I../Benoit/src
 OBJECTS = Neuron_base.o Neuron_input.o Neuron_linear.o Neuron_sigmoid.o NeuralNet.o
 
-Alexander.so: $(OBJECTS)
-	ld -shared -o Alexander.so $(OBJECTS)
+libAlexander.so: $(OBJECTS)
+	gcc -shared -Wl,-soname,libAlexander.so.1 -o libAlexander.so.1.0 $(OBJECTS); \
+	ln -s libAlexander.so.1.0 libAlexander.so.1; \
+	ln -s libAlexander.so.1 libAlexander.so
 
 Neuron_base.o : Neuron_base.cpp Neuron_base.h
 	$(CC) $(CFLAGS) -c Neuron_base.cpp
@@ -22,5 +24,10 @@ NeuralNet.o : NeuralNet.cpp NeuralNet.h Neuron_base.h Neuron_input.h
 
 clean :
 	rm $(OBJECTS); \
-	rm Alexander.so
+	rm libAlexander.so libAlexander.so.1 libAlexander.so.1.0
 
+#$ gcc -fPIC -c *.c
+#$ gcc -shared -Wl,-soname,libfoo.so.1 -o libfoo.so.1.0 *.o
+#$ ln -s libfoo.so.1.0 libfoo.so.1
+#$ ln -s libfoo.so.1 libfoo.so
+#$ LD_LIBRARY_PATH=`pwd`:$LD_LIBRARY_PATH ; export LD_LIBRARY_PATH

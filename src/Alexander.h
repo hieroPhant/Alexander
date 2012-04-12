@@ -22,7 +22,7 @@
 */
 
 #include <utility>
-#include "pugixml.hpp"
+#include <pugixml.hpp>
 #include "Benoit.h"
 
 namespace alex {

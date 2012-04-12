@@ -110,7 +110,7 @@ namespace alex {
 	
 	bool NeuralNet::build_network(const char* pfilename) {
 		pugi::xml_document doc;
-		pugi::xml_parse_result result = doc.load_file(*pfilename);
+		pugi::xml_parse_result result = doc.load_file(pfilename);
 		
 	}
 

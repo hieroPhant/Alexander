@@ -19,12 +19,15 @@
 */
 
 //to test Alexander, run the following from the test directory:
-//	g++ -std=c++0x -g -I ../src -I ../Benoit/src test_alex.cpp -o test
-//	./test
+//	g++ -std=c++0x -g -I../src -I../Benoit/src test_alex.cpp -o test_alex
+//	./test_alex
 
 #include "Alexander.h"
 
 int main() {
 
+	pugi::xml_document doc;
+	pugi::xml_parse_result result = doc.load_file("test_network.xml");
 	return 0;
 }
+
