@@ -150,7 +150,7 @@ namespace alex {
 			if(layer.attribute("number").as_int() == layers) break; //if last layer
 			
 			hidden_layers.push_back( vector<Neuron_base>() ); //maybe error here
-			itl = hidden_layers.end();
+			itl = hidden_layers.end(); //iterator pointing to a vector<Neuron_base>
 			
 			for(xml_node neuron = layer.child("neuron"); 
 			    neuron; 

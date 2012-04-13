@@ -74,10 +74,10 @@ namespace alex {
 			    backprop_index_type&  bIndex,
 			    const data_type bias=0.0,
 			    const bool trainable=true);
-		Neuron_base(const Neuron_base& rhs);
+		Neuron_base(const Neuron_base& rhs); //use a clone() method instead
 		Neuron_base(Neuron_base&& rhs);
-		Neuron_base& operator=(const Neuron_base& rhs);
-		Neuron_base& operator=(Neuron_base&& rhs) = delete;
+		Neuron_base& operator=(const Neuron_base& rhs); //delete this
+		Neuron_base& operator=(Neuron_base&& rhs); //need this
 		virtual ~Neuron_base();
 		
 		data_type fire();

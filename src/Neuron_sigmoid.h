@@ -37,10 +37,10 @@ namespace alex {
 				forward_index_type& fIndex,
 				backprop_index_type& bIndex);
 		Neuron_sigmoid(forward_index_type& fIndex, backprop_index_type& bIndex);
-		Neuron_sigmoid(const Neuron_sigmoid& rhs) = default;
+		Neuron_sigmoid(const Neuron_sigmoid& rhs) = default; //delete this
 		Neuron_sigmoid(Neuron_sigmoid&& rhs);
-		Neuron_sigmoid& operator=(const Neuron_sigmoid& rhs) = default;
-		Neuron_sigmoid& operator=(Neuron_sigmoid&& rhs) = delete;
+		Neuron_sigmoid& operator=(const Neuron_sigmoid& rhs) = default; //delete this
+		Neuron_sigmoid& operator=(Neuron_sigmoid&& rhs) = default;
 		~Neuron_sigmoid() = default;
 	}; //class Neuron_sigmoid
 	

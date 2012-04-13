@@ -39,10 +39,10 @@ namespace alex {
 			     backprop_index_type& bIndex);
 		Neuron_input(forward_index_type& fIndex, 
 			     backprop_index_type& bIndex);
-		Neuron_input(const Neuron_input& rhs) = default;
+		Neuron_input(const Neuron_input& rhs) = default; //delete this
 		Neuron_input(Neuron_input&& rhs);
-		Neuron_input& operator=(const Neuron_input& rhs) = default;
-		Neuron_input& operator=(Neuron_input&& rhs) = delete;
+		Neuron_input& operator=(const Neuron_input& rhs) = default; //delete this
+		Neuron_input& operator=(Neuron_input&& rhs) = default;
 		~Neuron_input() = default;
 		
 		data_type take_gradient()

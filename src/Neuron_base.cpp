@@ -69,6 +69,18 @@ namespace alex {
 		return *this;
 	} 
 	
+	Neuron_base& Neuron_base::operator=(Neuron_base&& rhs) {
+		//this method doesn't make semantic sense,
+		//but it's apparently required by std::vector
+		
+		//will have to add this method to ben::Node, which means
+		//making ID private and non-const, with access from ID()
+		//will also have to find all instances of public access of ID
+		
+		//updating Node* stored in ben::Index may get complicated, especially
+		//when move operations leave the rhs object invalid
+	}
+	
 	Neuron_base::~Neuron_base() = default;
 	
 	void Neuron_base::collect_signals() {
