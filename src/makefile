@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -std=c++0x -fPIC -g -I../Benoit/src
+CFLAGS = -std=c++0x -fPIC -g -I../Benoit/src -lpugixml
 OBJECTS = Neuron_base.o Neuron_input.o Neuron_linear.o Neuron_sigmoid.o NeuralNet.o
 
 libAlexander.so: $(OBJECTS)
