@@ -24,6 +24,18 @@
 
 namespace alex {
 	
+	Neuron_base::Neuron_base(pugi::xml_node neuron,
+				 forward_index_type& fIndex,
+				 backprop_index_type& bIndex)
+		: forward_node( fIndex, 0.0, neuron.attribute("id").as_int() ), 
+		  backprop_node(bIndex, std::make_pair(0.0, false), forward_node.ID) {
+		
+		if(neuron.attribute("bias").value() != "") { //if there's a value here
+			forward_node.bias = neuron.attribute("bias").as_double();
+			backprop_node.bias.second = neuron.attribute("trainable").as_bool();
+		}
+	}
+	
 	Neuron_base::Neuron_base(forward_index_type& fIndex,
 				 backprop_index_type& bIndex,
 				 const data_type bias, 

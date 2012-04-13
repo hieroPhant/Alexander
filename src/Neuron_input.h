@@ -27,15 +27,18 @@ namespace alex {
 
 	class Neuron_input : public Neuron_base {
 	private:
-		virtual data_type f(const data_type z) { return 0.0; }
-		virtual data_type df(const data_type z) { return 0.0; }
+		virtual data_type f(const data_type z) const { return 0.0; }
+		virtual data_type df(const data_type z) const { return 0.0; }
 		void fire();
 		void train();
 		
 	public:
 		Neuron_input() = delete;
+		Neuron_input(pugi::xml_node neuron, 
+			     forward_index_type& fIndex, 
+			     backprop_index_type& bIndex);
 		Neuron_input(forward_index_type& fIndex, 
-			  backprop_index_type& bIndex);
+			     backprop_index_type& bIndex);
 		Neuron_input(const Neuron_input& rhs) = default;
 		Neuron_input(Neuron_input&& rhs);
 		Neuron_input& operator=(const Neuron_input& rhs) = default;

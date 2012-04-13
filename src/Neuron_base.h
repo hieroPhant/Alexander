@@ -62,11 +62,14 @@ namespace alex {
 		data_type collect_errors();
 		virtual void distribute_errors(const data_type gradient);
 		
-		virtual data_type f(const data_type z) = 0;
-		virtual data_type df(const data_type z) = 0;
+		virtual data_type f(const data_type z) const = 0;
+		virtual data_type df(const data_type z) const = 0;
 		
 	public:
 		Neuron_base() = default;
+		Neuron_base(pugi::xml_node neuron,
+			    forward_index_type&   fIndex,
+			    backprop_index_type&  bIndex);
 		Neuron_base(forward_index_type&   fIndex, 
 			    backprop_index_type&  bIndex,
 			    const data_type bias=0.0,

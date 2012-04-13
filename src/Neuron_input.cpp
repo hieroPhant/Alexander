@@ -22,6 +22,11 @@
 
 namespace alex {
 
+	Neuron_input::Neuron_input(pugi::xml_node neuron,
+				   forward_index_type& fIndex, 
+				   backprop_index_type& bIndex)
+		: Neuron_base(neuron, fIndex, bIndex) {}
+
 	Neuron_input::Neuron_input(forward_index_type& fIndex, backprop_index_type& bIndex) 
 		: Neuron_base(fIndex, bIndex, 0.0, false) {}
 	

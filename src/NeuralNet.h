@@ -23,6 +23,7 @@
 
 #include <vector>
 #include <list>
+#include <string>
 #include "Alexander.h"
 
 namespace alex {
@@ -40,6 +41,8 @@ namespace alex {
 		forward_index_type forward_index;
 		backprop_index_type backprop_index;
 		
+		bool create_neuron(pugi::xml_node neuron, std::vector<Neuron_base>& layer);
+		
 	public:
 		NeuralNet() = default;
 		explicit NeuralNet(const char* pfilename);
@@ -52,7 +55,8 @@ namespace alex {
 		void run();
 		void backpropagate();
 		
-		bool build_network(const char* pfilename); //argument for filename here, call pugixml
+		bool build_network(const char* pfilename); 
+		void clear();
 	
 	}; //class NeuralNet
 

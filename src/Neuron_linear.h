@@ -33,6 +33,9 @@ namespace alex {
 	public:
 		//constructors need work
 		Neuron_linear() = delete;
+		Neuron_linear(pugi::xml_node neuron,
+			      forward_index_type& fIndex,
+			      backprop_index_type& bIndex);
 		Neuron_linear(forward_index_type& fIndex, backprop_index_type& bIndex);
 		Neuron_linear(const Neuron_linear& rhs) = default;
 		Neuron_linear(Neuron_linear&& rhs);

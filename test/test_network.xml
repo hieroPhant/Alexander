@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<network>
+<network layers="3">
 	<name>XOR</name>
 	<layer number="1">
 		<neuron id="1" type="input"/>
 		<neuron id="2" type="input"/>
 	</layer>
 	<layer number="2">
-		<neuron id="3" type="sigmoid" bias="0.0">
+		<neuron id="3" type="sigmoid" bias="0.0" trainable="1">
 			<link origin-id="1" weight="1.0" trainable="1"/>
 			<link origin-id="2" weight="-1.0" trainable="1"/>
 		</neuron>
@@ -17,7 +17,7 @@
 		</neuron>
 	</layer>
 	<layer number="3">
-		<neuron id="5" type="sigmoid" bias="1.0">
+		<neuron id="5" type="sigmoid" bias="1.0" trainable="1">
 			<link origin-id="3" weight="1.0" trainable="1"/>
 			<link origin-id="4" weight="1.0" trainable="1"/>
 		</neuron>

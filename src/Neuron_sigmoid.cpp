@@ -22,6 +22,11 @@
 
 namespace alex {
 
+	Neuron_sigmoid::Neuron_sigmoid( pugi::xml_node neuron, 
+					forward_index_type& fIndex,
+					backprop_index_type& bIndex) 
+		: Neuron_base(neuron, fIndex, bIndex) {}
+
 	Neuron_sigmoid::Neuron_sigmoid(forward_index_type& fIndex, backprop_index_type& bIndex) 
 		: Neuron_base(fIndex, bIndex, 0.0) {}
 	

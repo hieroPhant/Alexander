@@ -33,6 +33,9 @@ namespace alex {
 	public:
 		//constructors need work
 		Neuron_sigmoid() = delete;
+		Neuron_sigmoid( pugi::xml_node neuron,
+				forward_index_type& fIndex,
+				backprop_index_type& bIndex);
 		Neuron_sigmoid(forward_index_type& fIndex, backprop_index_type& bIndex);
 		Neuron_sigmoid(const Neuron_sigmoid& rhs) = default;
 		Neuron_sigmoid(Neuron_sigmoid&& rhs);

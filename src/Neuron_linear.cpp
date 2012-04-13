@@ -22,6 +22,11 @@
 
 namespace alex {
 
+	Neuron_linear::Neuron_linear(pugi::xml_node neuron, 
+				     forward_index_type& fIndex,
+				     backprop_index_type& bIndex) 
+		: Neuron_base(neuron, fIndex, bIndex) {}
+
 	Neuron_linear::Neuron_linear(forward_index_type& fIndex, backprop_index_type& bIndex) 
 		: Neuron_base(fIndex, bIndex, 0.0) {}
 	

@@ -109,9 +109,87 @@ namespace alex {
 	}
 	
 	bool NeuralNet::build_network(const char* pfilename) {
-		pugi::xml_document doc;
-		pugi::xml_parse_result result = doc.load_file(pfilename);
+		using namespace pugi;
+		using namespace std;
 		
+		//parse xml document
+		xml_document doc;
+		xml_parse_result result = doc.load_file(pfilename);
+		if(!result) {
+			cout << "XML parsed with errors, attr value: [" 
+			     << doc.child("node").attribute("attr").value() << "]" << endl;
+    			cout << "Error description: " << result.description() << endl;
+    			cout << "Error offset: " << result.offset 
+    			     << " (error at [..." << (pfilename + result.offset) 
+    			     << "]" << endl << endl;
+    			return false;
+		}
+		
+		//make sure network is empty to start
+		clear();
+		xml_node network = doc.child("network");
+		unsigned int layers = network.attribute("layers").as_int();
+		
+		////////////////////// first pass to create neurons
+		//build input layer
+		xml_node layer = network.child("layer");
+		unsigned int ID;
+		for(xml_node neuron = layer.child("neuron"); 
+		    neuron; 
+		    neuron = neuron.next_sibling("neuron")) 
+			input_layer.push_back( Neuron_input(neuron, 
+							    forward_index, 
+							    backprop_index) ); //error here
+		
+		//hidden layers
+		list< vector<Neuron_base> >::iterator itl;
+		for(layer = layer.next_sibling("layer"); 
+		    layer; 
+		    layer = layer.next_sibling("layer")) {
+		    
+			if(layer.attribute("number").as_int() == layers) break; //if last layer
+			
+			hidden_layers.push_back( vector<Neuron_base>() ); //maybe error here
+			itl = hidden_layers.end();
+			
+			for(xml_node neuron = layer.child("neuron"); 
+			    neuron; 
+			    neuron = neuron.next_sibling("neuron"))
+				if( !create_neuron(neuron, *itl) ) return false;
+		}
+		
+		//output layer
+		for(xml_node neuron = layer.child("neuron"); 
+		    neuron; 
+		    neuron = neuron.next_sibling("neuron")) 
+			if( !create_neuron(neuron, output_layer) ) return false;
+		
+		//////////////////// second pass to create links
+		
+		return true;
+	}
+	
+	bool NeuralNet::create_neuron(pugi::xml_node neuron, std::vector<Neuron_base>& layer) {
+		using namespace pugi;
+		
+		std::string type = neuron.attribute("type").value();
+		if(type == "linear")
+			//error here
+			layer.push_back( Neuron_linear(neuron, forward_index, backprop_index) );
+		else if(type == "sigmoid")
+			//error here
+			layer.push_back(Neuron_sigmoid(neuron, forward_index, backprop_index) );
+		else return false;
+		
+		return true;
+	}
+	
+	void NeuralNet::clear() {
+		output_layer.clear();
+		hidden_layers.clear();
+		input_layer.clear();
+		//index objects should be clear now too, but they don't have a clear() method
 	}
 
 } //namespace alex
+
