@@ -28,7 +28,7 @@ namespace alex {
 				 forward_index_type& fIndex,
 				 backprop_index_type& bIndex)
 		: forward_node( fIndex, 0.0, neuron.attribute("id").as_int() ), 
-		  backprop_node(bIndex, std::make_pair(0.0, false), forward_node.ID) {
+		  backprop_node(bIndex, std::make_pair(0.0, false), forward_node.ID()) {
 		
 		if(neuron.attribute("bias").value() != "") { //if there's a value here
 			forward_node.bias = neuron.attribute("bias").as_double();
@@ -41,11 +41,11 @@ namespace alex {
 				 const data_type bias, 
 				 const bool trainable) 
 		: forward_node(fIndex, bias), 
-		  backprop_node(bIndex, std::make_pair(0.0, trainable), forward_node.ID) {}
+		  backprop_node(bIndex, std::make_pair(0.0, trainable), forward_node.ID()) {}
 	
 	Neuron_base::Neuron_base(const Neuron_base& rhs) 
 		: forward_node(rhs.forward_node), 
-		  backprop_node(rhs.backprop_node, forward_node.ID),
+		  backprop_node(rhs.backprop_node, forward_node.ID()),
 		  state(rhs.state), 
 		  output(rhs.output),
 		  learning_rate(rhs.learning_rate),
@@ -79,6 +79,13 @@ namespace alex {
 		
 		//updating Node* stored in ben::Index may get complicated, especially
 		//when move operations leave the rhs object invalid
+		forward_node = std::move( rhs.forward_node );
+		backprop_node = std::move( rhs.backprop_node );
+		state = rhs.state;
+		output = rhs.output;
+		learning_rate = rhs.learning_rate;
+		momentum = rhs.momentum;
+		return *this;
 	}
 	
 	Neuron_base::~Neuron_base() = default;

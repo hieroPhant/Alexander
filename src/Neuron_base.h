@@ -77,8 +77,11 @@ namespace alex {
 		Neuron_base(const Neuron_base& rhs); //use a clone() method instead
 		Neuron_base(Neuron_base&& rhs);
 		Neuron_base& operator=(const Neuron_base& rhs); //delete this
-		Neuron_base& operator=(Neuron_base&& rhs); //need this
+		Neuron_base& operator=(Neuron_base&& rhs); //make assigment operators virtual?
 		virtual ~Neuron_base();
+		
+		//When copied or moved in STL container, it complains because Neuron_base
+		//is an abstract type and derived types may not match. Fuck.
 		
 		data_type fire();
 		void train(); //delegates to other version (default argument can't use 'this')
@@ -94,7 +97,7 @@ namespace alex {
 		void remove_input(const ID_type address); 
 		
 		void clear();
-		ID_type ID() const { return forward_node.ID; }
+		inline ID_type ID() const { return forward_node.ID(); }
 	}; //class Neuron_base
 
 } //namespace alex
