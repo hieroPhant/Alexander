@@ -25,6 +25,7 @@
 #include <list>
 #include <string>
 #include "Alexander.h"
+#include "copy_ptr.h"
 
 namespace alex {
 
@@ -35,13 +36,14 @@ namespace alex {
 	
 	protected:
 		std::vector<Neuron_input> input_layer;
-		std::list< std::vector<Neuron_base> > hidden_layers;
-		std::vector<Neuron_base> output_layer;
+		std::vector< std::vector< poly<Neuron_base> > > hidden_layers;
+		std::vector< poly<Neuron_base> > output_layer;
 		
 		forward_index_type forward_index;
 		backprop_index_type backprop_index;
 		
-		bool create_neuron(pugi::xml_node neuron, std::vector<Neuron_base>& layer);
+		bool create_neuron(pugi::xml_node neuron, 
+				   std::vector< poly<Neuron_base> >& layer);
 		
 	public:
 		NeuralNet() = default;

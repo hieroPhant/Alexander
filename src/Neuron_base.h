@@ -81,7 +81,8 @@ namespace alex {
 		virtual ~Neuron_base();
 		
 		//When copied or moved in STL container, it complains because Neuron_base
-		//is an abstract type and derived types may not match. Fuck.
+		//is an abstract type and derived types may not match. Now using list instead
+		//of vector for storage, but this might lead to memory fragmentation
 		
 		data_type fire();
 		void train(); //delegates to other version (default argument can't use 'this')

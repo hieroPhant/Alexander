@@ -57,12 +57,12 @@ namespace alex {
 		
 		auto ith = hidden_layers.begin();
 		auto ithe = hidden_layers.end();
-		std::vector<Neuron_base>::iterator itl, itle;
+		std::vector< poly<Neuron_base> >::iterator itl, itle;
 		while(ith != ithe) { //each layer
 			itl = ith->begin();
 			itle = ith->end();
 			while(itl != itle) { //each neuron in a layer
-				itl->fire();
+				(*itl)->fire(); 
 				++itl;
 			}
 			++ith;
@@ -71,7 +71,7 @@ namespace alex {
 		auto ito = output_layer.begin();
 		auto itoe = output_layer.end();
 		while(ito != itoe) { //each output neuron
-			ito->fire(); //do something with this return value
+			(*ito)->fire(); //do something with this return value
 			++ito;
 		}
 	}
@@ -83,18 +83,18 @@ namespace alex {
 		auto ito = output_layer.rbegin();
 		auto itoe = output_layer.rend();
 		while(ito != itoe) { //each output neuron
-			ito->train(); //needs argument and from supervisory data
+			(*ito)->train(); //needs argument and from supervisory data
 			++ito;
 		}
 		
 		auto ith = hidden_layers.rbegin();
 		auto ithe = hidden_layers.rend();
-		std::vector<Neuron_base>::reverse_iterator itl, itle;
+		std::vector< poly<Neuron_base> >::reverse_iterator itl, itle;
 		while(ith != ithe) { //each layer
 			itl = ith->rbegin();
 			itle = ith->rend();
 			while(itl != itle) { //each neuron in a layer
-				itl->train();
+				(*itl)->train();
 				++itl;
 			}
 			++ith;
@@ -142,15 +142,15 @@ namespace alex {
 							    backprop_index) ); //error here
 		
 		//hidden layers
-		list< vector<Neuron_base> >::iterator itl;
+		vector< vector< poly<Neuron_base> > >::iterator itl;
 		for(layer = layer.next_sibling("layer"); 
 		    layer; 
 		    layer = layer.next_sibling("layer")) {
 		    
 			if(layer.attribute("number").as_int() == layers) break; //if last layer
 			
-			hidden_layers.push_back( vector<Neuron_base>() ); //maybe error here
-			itl = hidden_layers.end(); //iterator pointing to a vector<Neuron_base>
+			hidden_layers.push_back( vector< poly<Neuron_base> >() ); //maybe error here
+			itl = hidden_layers.end(); //iterator pointing to a list<Neuron_base>
 			
 			for(xml_node neuron = layer.child("neuron"); 
 			    neuron; 
@@ -169,16 +169,17 @@ namespace alex {
 		return true;
 	}
 	
-	bool NeuralNet::create_neuron(pugi::xml_node neuron, std::vector<Neuron_base>& layer) {
+	bool NeuralNet::create_neuron(pugi::xml_node neuron, 
+				      std::vector< poly<Neuron_base> >& layer) {
 		using namespace pugi;
 		
 		std::string type = neuron.attribute("type").value();
 		if(type == "linear")
 			//error here
-			layer.push_back( Neuron_linear(neuron, forward_index, backprop_index) );
+			layer.push_back( poly<Neuron_base>(Neuron_linear(neuron, forward_index, backprop_index)) );
 		else if(type == "sigmoid")
 			//error here
-			layer.push_back(Neuron_sigmoid(neuron, forward_index, backprop_index) );
+			layer.push_back( poly<Neuron_base>(Neuron_sigmoid(neuron, forward_index, backprop_index)) );
 		else return false;
 		
 		return true;
