@@ -139,26 +139,25 @@ namespace alex {
 		    neuron = neuron.next_sibling("neuron")) 
 			input_layer.push_back( Neuron_input(neuron, 
 							    forward_index, 
-							    backprop_index) ); //error here
+							    backprop_index) ); 
 		
 		//hidden layers
-		vector< vector< poly<Neuron_base> > >::iterator itl;
-		for(layer = layer.next_sibling("layer"); 
-		    layer; 
-		    layer = layer.next_sibling("layer")) {
-		    
-			if(layer.attribute("number").as_int() == layers) break; //if last layer
-			
-			hidden_layers.push_back( vector< poly<Neuron_base> >() ); //maybe error here
-			itl = hidden_layers.end(); //iterator pointing to a list<Neuron_base>
+		hidden_layers.resize(layers - 2); //number of layers excluding i/o
+		auto itl = hidden_layers.begin();
+		auto itle = hidden_layers.end();
+		while(itl != itle) {
+			layer = layer.next_sibling("layer");
 			
 			for(xml_node neuron = layer.child("neuron"); 
 			    neuron; 
 			    neuron = neuron.next_sibling("neuron"))
 				if( !create_neuron(neuron, *itl) ) return false;
+			
+			++itl;
 		}
 		
 		//output layer
+		layer = layer.next_sibling("layer");
 		for(xml_node neuron = layer.child("neuron"); 
 		    neuron; 
 		    neuron = neuron.next_sibling("neuron")) 
@@ -174,13 +173,14 @@ namespace alex {
 		using namespace pugi;
 		
 		std::string type = neuron.attribute("type").value();
+		poly<Neuron_base> temp;
 		if(type == "linear")
-			//error here
-			layer.push_back( poly<Neuron_base>(Neuron_linear(neuron, forward_index, backprop_index)) );
+			temp = Neuron_linear(neuron, forward_index, backprop_index);
 		else if(type == "sigmoid")
-			//error here
-			layer.push_back( poly<Neuron_base>(Neuron_sigmoid(neuron, forward_index, backprop_index)) );
+			temp = Neuron_sigmoid(neuron, forward_index, backprop_index);
 		else return false;
+		
+		layer.push_back(temp);
 		
 		return true;
 	}
