@@ -7,11 +7,11 @@
 		<neuron id="2" type="input"/>
 	</layer>
 	<layer number="2">
-		<neuron id="3" type="sigmoid" bias="0.0" trainable="1">
+		<neuron id="3" type="sigmoid" bias="1.0" trainable="1">
 			<link origin-id="1" weight="1.0" trainable="1"/>
 			<link origin-id="2" weight="-1.0" trainable="1"/>
 		</neuron>
-		<neuron id="4" type="sigmoid" bias="1.0">
+		<neuron id="4" type="sigmoid" bias="1.0" trainable="1">
 			<link origin-id="1" weight="-1.0" trainable="1"/>
 			<link origin-id="2" weight="1.0" trainable="1"/>
 		</neuron>

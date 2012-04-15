@@ -23,7 +23,18 @@
 namespace alex {
 	
 	NeuralNet::NeuralNet(const char* pfilename) {
-		build_network(pfilename);
+		using namespace std;
+		
+		switch( build_network(pfilename) ) {
+			case 0: cout << "Network parse succeeded." << endl; 	break;
+			case 1: break;
+			case 2: cout << "Misplaced input neuron." << endl; 	break;
+			case 3: cout << "Bad hidden neuron." << endl; 		break;
+			case 4: cout << "Bad output neuron." << endl; 		break;
+			case 5: cout << "Bad hidden link." << endl;		break;
+			case 6: cout << "Bad output link." << endl;		break;
+			default: cout << "Unknown error parsing network" << endl;
+		}
 	}
 	
 	NeuralNet::NeuralNet(NeuralNet&& rhs) 
@@ -42,7 +53,9 @@ namespace alex {
 		return *this;
 	}
 	
-	NeuralNet::~NeuralNet() = default;
+	NeuralNet::~NeuralNet() {
+		clear();
+	}
 	
 	void NeuralNet::run() {
 		//this method executes the entire network once, or forward one step
@@ -58,7 +71,7 @@ namespace alex {
 		
 		auto ith = hidden_layers.begin();
 		auto ithe = hidden_layers.end();
-		std::vector< poly<Neuron_base> >::iterator itl, itle;
+		std::vector< Neuron_base* >::iterator itl, itle;
 		while(ith != ithe) { //each layer
 			itl = ith->begin();
 			itle = ith->end();
@@ -90,7 +103,7 @@ namespace alex {
 		
 		auto ith = hidden_layers.rbegin();
 		auto ithe = hidden_layers.rend();
-		std::vector< poly<Neuron_base> >::reverse_iterator itl, itle;
+		std::vector< Neuron_base* >::reverse_iterator itl, itle;
 		while(ith != ithe) { //each layer
 			itl = ith->rbegin();
 			itle = ith->rend();
@@ -109,7 +122,7 @@ namespace alex {
 		}
 	}
 	
-	bool NeuralNet::build_network(const char* pfilename) {
+	int NeuralNet::build_network(const char* pfilename) {
 		using namespace pugi;
 		using namespace std;
 		
@@ -124,12 +137,13 @@ namespace alex {
     			cout << "Error offset: " << result.offset 
     			     << " (error at [..." << (pfilename + result.offset) 
     			     << "]" << endl << endl;
-    			return false;
+    			return 1;
 		}
 		
 		//make sure network is empty to start
 		clear();
 		
+		///////////////////// first pass for basic checks
 		//initial parse, counting objects
 		xml_node network = doc.child("network");
 		unsigned int layers = 0;
@@ -145,16 +159,13 @@ namespace alex {
 		    	    
 		    	    	//++neurons_in_layers[layers];
 		    	    	string type = neuron.attribute("type").value();
-		    	    	if( (layers==0) != (type=="input") ) {
-		    	    		 cout << "Misplaced input neuron." << endl;
-		    	    		 return false;
-		    	    	}
+		    	    	if( (layers==0) != (type=="input") ) return 2;
 		    	}
 		    	
 		    	++layers;
 		}
 		
-		////////////////////// first pass to create neurons
+		////////////////////// second pass to create neurons
 		//build input layer
 		xml_node layer = network.child("layer");
 		unsigned int ID;
@@ -175,7 +186,7 @@ namespace alex {
 			for(xml_node neuron = layer.child("neuron"); 
 			    neuron; 
 			    neuron = neuron.next_sibling("neuron"))
-				if( !create_neuron(neuron, *itl) ) return false;
+				if( !create_neuron(neuron, *itl) ) return 3;
 			
 			++itl;
 		}
@@ -185,36 +196,100 @@ namespace alex {
 		for(xml_node neuron = layer.child("neuron"); 
 		    neuron; 
 		    neuron = neuron.next_sibling("neuron")) 
-			if( !create_neuron(neuron, output_layer) ) return false;
+			if( !create_neuron(neuron, output_layer) ) return 4;
 		
-		//////////////////// second pass to create links
+		//////////////////// third pass to create links
+		//inputs to hidden layers
+		layer = network.child("layer");
+		layer = layer.next_sibling("layer"); //starting at first hidden layer
+		xml_node neuron;
 		
-		return true;
+		vector< Neuron_base* >::iterator itn, itne;
+		itl = hidden_layers.begin();
+		itle = hidden_layers.end();
+		while(itl != itle) {
+		    	
+		    	neuron = layer.child("neuron");
+		    	
+		    	itn = itl->begin();
+		    	itne = itl->end();
+			while(itn != itne) {
+
+				for(xml_node link = neuron.child("link");
+				    link;
+				    link = link.next_sibling("link"))
+					if( !(*itn)->add_input(link) ) return 5;
+				
+				neuron = neuron.next_sibling("neuron");
+				++itn;
+			}
+			
+			layer = layer.next_sibling("layer");
+			++itl;
+		}
+		
+		//inputs to output layer
+		neuron = layer.child("neuron");
+		
+		itn = output_layer.begin();
+		itne = output_layer.end();
+		while(itn != itne) {
+			
+			for(xml_node link = neuron.child("link");
+			    link;
+			    link = link.next_sibling("link"))
+				if( !(*itn)->add_input(link) ) return 6;
+			
+			neuron = neuron.next_sibling("neuron");
+			++itn;
+		}
+		
+		return 0;
 	}
 	
 	bool NeuralNet::create_neuron(pugi::xml_node neuron, 
-				      std::vector< poly<Neuron_base> >& layer) {
+				      std::vector< Neuron_base* >& layer) {
 		using namespace pugi;
 		
 		std::string type = neuron.attribute("type").value();
-		poly<Neuron_base> temp;
+		Neuron_base* ptr;
 		if(type == "linear")
-			temp = Neuron_linear(neuron, forward_index, backprop_index);
+			ptr = new Neuron_linear(neuron, forward_index, backprop_index);
 		else if(type == "sigmoid")
-			temp = Neuron_sigmoid(neuron, forward_index, backprop_index);
+			ptr = new Neuron_sigmoid(neuron, forward_index, backprop_index);
 		else return false;
 		
-		layer.push_back(temp);
+		layer.push_back(ptr);
 		
 		return true;
 	}
 	
 	void NeuralNet::clear() {
-		output_layer.clear();
-		hidden_layers.clear();
+	
+		std::vector< Neuron_base* >::iterator itn, itne;
+		auto itl = hidden_layers.begin();
+		auto itle = hidden_layers.end();
+		while(itl != itle) {
+			
+			itn = itl->begin();
+			itne = itl->end();
+			while(itn != itne) {
+				delete *itn;
+				*itn = NULL;
+				++itn;
+			}
+			++itl;
+		}
+		
+		itn = output_layer.begin();
+		itne = output_layer.end();
+		while(itn != itne) {
+			delete *itn;
+			*itn = NULL;
+			++itn;
+		}
+		
 		input_layer.clear();
-		//index objects should be clear now too, 
-		//but they don't have a clear() method
 	}
 
 } //namespace alex

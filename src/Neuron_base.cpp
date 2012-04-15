@@ -47,6 +47,9 @@ namespace alex {
 		//check Node::index pointers
 	}
 	
+	//copy construction is used by STL but doesn't preserve nodeIDs
+	//try implementing move semantics instead, and adding a clone function
+	//for making unique copies
 	Neuron_base::Neuron_base(const Neuron_base& rhs) 
 		: forward_node(rhs.forward_node), 
 		  backprop_node(rhs.backprop_node, forward_node.ID()),
@@ -190,11 +193,22 @@ namespace alex {
 		}
 	}
 	
-	void Neuron_base::add_input(const ID_type address, 
+	bool Neuron_base::add_input(const ID_type address, 
 				    const data_type weight,
 				    const bool trainable) {
-		forward_node.add_input(address, weight);
-		backprop_node.add_output(address, std::make_pair(0.0, trainable)); 
+		bool flink, blink;
+		flink = forward_node.add_input(address, weight);
+		blink = backprop_node.add_output(address, std::make_pair(0.0, trainable)); 
+		if(flink && blink) return true;
+		else return false;
+	}
+	
+	bool Neuron_base::add_input(pugi::xml_node link) {
+		const ID_type address = link.attribute("origin-id").as_int();
+		const data_type weight = link.attribute("weight").as_double();
+		const bool trainable = link.attribute("trainable").as_bool();
+		if( add_input(address, weight, trainable) ) return true;
+		else return false;
 	}
 	
 	void Neuron_base::remove_input(const ID_type address) {

@@ -96,8 +96,9 @@ namespace alex {
 		void set_rates(const data_type rate, const data_type factor);
 		void update_weights();
 
-		void add_input(	const ID_type address, const data_type weight, 
+		bool add_input(	const ID_type address, const data_type weight, 
 				const bool trainable=true);
+		bool add_input(pugi::xml_node link);
 		void remove_input(const ID_type address); 
 		
 		void clear();

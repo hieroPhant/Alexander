@@ -36,14 +36,17 @@ namespace alex {
 	
 	protected:
 		std::vector<Neuron_input> input_layer;
-		std::vector< std::vector< poly<Neuron_base> > > hidden_layers;
-		std::vector< poly<Neuron_base> > output_layer;
+		//poly<ptr> copies objects without preserving id semantics
+		//and leads to more copies than necessary. Just use bare pointers
+		//and be careful
+		std::vector< std::vector<Neuron_base*> > hidden_layers;
+		std::vector< Neuron_base* > output_layer;
 		
 		forward_index_type forward_index;
 		backprop_index_type backprop_index;
 		
 		bool create_neuron(pugi::xml_node neuron, 
-				   std::vector< poly<Neuron_base> >& layer);
+				   std::vector< Neuron_base* >& layer);
 		
 	public:
 		NeuralNet() = default;
@@ -57,7 +60,7 @@ namespace alex {
 		void run();
 		void backpropagate();
 		
-		bool build_network(const char* pfilename); 
+		int build_network(const char* pfilename); 
 		void clear();
 	
 	}; //class NeuralNet
