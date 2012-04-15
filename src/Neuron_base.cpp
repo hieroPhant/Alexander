@@ -30,9 +30,11 @@ namespace alex {
 		: forward_node( fIndex, 0.0, neuron.attribute("id").as_int() ), 
 		  backprop_node(bIndex, std::make_pair(0.0, false), forward_node.ID()) {
 		
+		//check Node::index pointers
+		
 		if(neuron.attribute("bias").value() != "") { //if there's a value here
 			forward_node.bias = neuron.attribute("bias").as_double();
-			backprop_node.bias.second = neuron.attribute("trainable").as_bool(); //this throws std::bad_alloc and I have no idea why
+			backprop_node.bias.second = neuron.attribute("trainable").as_bool(); 
 		}
 	}
 	
@@ -41,7 +43,9 @@ namespace alex {
 				 const data_type bias, 
 				 const bool trainable) 
 		: forward_node(fIndex, bias), 
-		  backprop_node(bIndex, std::make_pair(0.0, trainable), forward_node.ID()) {}
+		  backprop_node(bIndex, std::make_pair(0.0, trainable), forward_node.ID()) {
+		//check Node::index pointers
+	}
 	
 	Neuron_base::Neuron_base(const Neuron_base& rhs) 
 		: forward_node(rhs.forward_node), 
@@ -57,7 +61,9 @@ namespace alex {
 		  state(rhs.state), 
 		  output(rhs.output),
 		  learning_rate(rhs.learning_rate),
-		  momentum(rhs.momentum) {} //move ctor
+		  momentum(rhs.momentum) {
+		//check Node::index pointers
+	} //move ctor
 		  
 	Neuron_base& Neuron_base::operator=(const Neuron_base& rhs) { 
 		forward_node = rhs.forward_node;
@@ -70,21 +76,14 @@ namespace alex {
 	} 
 	
 	Neuron_base& Neuron_base::operator=(Neuron_base&& rhs) {
-		//this method doesn't make semantic sense,
-		//but it's apparently required by std::vector
 		
-		//will have to add this method to ben::Node, which means
-		//making ID private and non-const, with access from ID()
-		//will also have to find all instances of public access of ID
-		
-		//updating Node* stored in ben::Index may get complicated, especially
-		//when move operations leave the rhs object invalid
 		forward_node = std::move( rhs.forward_node );
 		backprop_node = std::move( rhs.backprop_node );
 		state = rhs.state;
 		output = rhs.output;
 		learning_rate = rhs.learning_rate;
 		momentum = rhs.momentum;
+		//check Node::index pointers
 		return *this;
 	}
 	

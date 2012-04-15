@@ -46,7 +46,8 @@ namespace alex {
 	
 	void NeuralNet::run() {
 		//this method executes the entire network once, or forward one step
-		//need to figure out where data comes from, and where to put the results
+		//need to figure out where data comes from, 
+		//and where to put the results
 		
 		auto iti = input_layer.begin();
 		auto itie = input_layer.end();
@@ -103,7 +104,7 @@ namespace alex {
 		auto iti = input_layer.rbegin();
 		auto itie = input_layer.rend();
 		while(iti != itie) { //each input neuron
-			iti->take_gradient(); //is this necessary? what is being trained?
+			iti->take_gradient(); //is this necessary?
 			++iti;
 		}
 	}
@@ -117,7 +118,8 @@ namespace alex {
 		xml_parse_result result = doc.load_file(pfilename);
 		if(!result) {
 			cout << "XML parsed with errors, attr value: [" 
-			     << doc.child("node").attribute("attr").value() << "]" << endl;
+			     << doc.child("node").attribute("attr").value() 
+			     << "]" << endl;
     			cout << "Error description: " << result.description() << endl;
     			cout << "Error offset: " << result.offset 
     			     << " (error at [..." << (pfilename + result.offset) 
@@ -127,8 +129,30 @@ namespace alex {
 		
 		//make sure network is empty to start
 		clear();
+		
+		//initial parse, counting objects
 		xml_node network = doc.child("network");
-		unsigned int layers = network.attribute("layers").as_int();
+		unsigned int layers = 0;
+		//vector<unsigned int> neurons_in_layers;
+		for(xml_node layer = network.child("layer");
+		    layer;
+		    layer = layer.next_sibling("layer")) {
+		    	
+		    	//neurons_in_layers.push_back(0);
+		    	for(xml_node neuron = layer.child("neuron");
+		    	    neuron;
+		    	    neuron = neuron.next_sibling("neuron")) {
+		    	    
+		    	    	//++neurons_in_layers[layers];
+		    	    	string type = neuron.attribute("type").value();
+		    	    	if( (layers==0) != (type=="input") ) {
+		    	    		 cout << "Misplaced input neuron." << endl;
+		    	    		 return false;
+		    	    	}
+		    	}
+		    	
+		    	++layers;
+		}
 		
 		////////////////////// first pass to create neurons
 		//build input layer
@@ -189,7 +213,8 @@ namespace alex {
 		output_layer.clear();
 		hidden_layers.clear();
 		input_layer.clear();
-		//index objects should be clear now too, but they don't have a clear() method
+		//index objects should be clear now too, 
+		//but they don't have a clear() method
 	}
 
 } //namespace alex
