@@ -3,7 +3,7 @@ CFLAGS = -std=c++0x -fPIC -g -I../Benoit/src -lpugixml
 OBJECTS = Neuron_base.o Neuron_input.o Neuron_linear.o Neuron_sigmoid.o NeuralNet.o
 
 libAlexander.so: $(OBJECTS)
-	gcc -shared -Wl,-soname,libAlexander.so.1 -o libAlexander.so.1.0 $(OBJECTS); \
+	gcc -g -shared -Wl,-soname,libAlexander.so.1 -o libAlexander.so.1.0 $(OBJECTS); \
 	ln -s libAlexander.so.1.0 libAlexander.so.1; \
 	ln -s libAlexander.so.1 libAlexander.so
 
@@ -24,7 +24,7 @@ NeuralNet.o : NeuralNet.cpp NeuralNet.h Neuron_base.h Neuron_input.h
 
 clean :
 	rm $(OBJECTS); \
-	rm libAlexander.so libAlexander.so.1 libAlexander.so.1.0
+	rm libAlexander.*
 	
 install :
 	sudo mv libAlexander.so /usr/lib64/.; \
@@ -32,7 +32,9 @@ install :
 	sudo ldconfig
 
 remove : 
-	sudo rm /usr/lib64/libAlexander.so /usr/lib64/libAlexander.so.1.0; \
+	rm $(OBJECTS); \
+	rm libAlexander.*; \
+	sudo rm /usr/lib64/libAlexander.*; \
 	sudo ldconfig
 
 #$ gcc -fPIC -c *.c

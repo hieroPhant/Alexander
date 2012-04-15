@@ -30,9 +30,11 @@ namespace alex {
 		: forward_node( fIndex, 0.0, neuron.attribute("id").as_int() ), 
 		  backprop_node(bIndex, std::make_pair(0.0, false), forward_node.ID()) {
 		
+		bool trainable;
 		if(neuron.attribute("bias").value() != "") { //if there's a value here
 			forward_node.bias = neuron.attribute("bias").as_double();
-			backprop_node.bias.second = neuron.attribute("trainable").as_bool();
+			trainable = neuron.attribute("trainable").as_bool();
+			backprop_node.bias.second = trainable; //this throws std::bad_alloc and I have no idea why
 		}
 	}
 	
