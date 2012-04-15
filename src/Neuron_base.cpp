@@ -207,6 +207,12 @@ namespace alex {
 		forward_node.clear();
 		backprop_node.clear();
 	}
-		
+	
+	std::ostream& operator<<(std::ostream& out, const Neuron_base& rhs) {
+		//finish this later?
+		out << "ID=" << rhs.forward_node.ID();
+		return out;
+	}
+	
 } //namespace alex
 

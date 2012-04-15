@@ -86,6 +86,16 @@ namespace alex {
 		poly_base<T>* ptr;
 	}; //struct poly
 
+	template <typename T>
+  	bool operator<(poly<T> const& p1, poly<T> const& p2) {
+    		return *p1 < *p2;
+  	}
+  
+	template <typename T>
+  	std::ostream& operator<<(std::ostream& out, poly<T> const& p) {
+    		return out << *p;
+  	}
+
 } //namespace alex
 
 #endif

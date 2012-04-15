@@ -83,6 +83,9 @@ namespace alex {
 		//When copied or moved in STL container, it complains because Neuron_base
 		//is an abstract type and derived types may not match. Now using list instead
 		//of vector for storage, but this might lead to memory fragmentation
+		friend std::ostream& operator<<(std::ostream& out, const Neuron_base& rhs);
+		bool operator<(const Neuron_base& rhs)
+			{ return forward_node.ID() < rhs.forward_node.ID(); }
 		
 		data_type fire();
 		void train(); //delegates to other version (default argument can't use 'this')

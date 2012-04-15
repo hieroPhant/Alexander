@@ -25,6 +25,15 @@ NeuralNet.o : NeuralNet.cpp NeuralNet.h Neuron_base.h Neuron_input.h
 clean :
 	rm $(OBJECTS); \
 	rm libAlexander.so libAlexander.so.1 libAlexander.so.1.0
+	
+install :
+	sudo mv libAlexander.so /usr/lib64/.; \
+	sudo mv libAlexander.so.1.0 /usr/lib64/.; \
+	sudo ldconfig
+
+remove : 
+	sudo rm /usr/lib64/libAlexander.so /usr/lib64/libAlexander.so.1.0; \
+	sudo ldconfig
 
 #$ gcc -fPIC -c *.c
 #$ gcc -shared -Wl,-soname,libfoo.so.1 -o libfoo.so.1.0 *.o
