@@ -23,19 +23,38 @@
 
 #include <iostream>
 #include "Alexander.h"
+#include "Benoit.h"
 
 namespace alex {
 
+	//Since execution is computationally the same backwards as forwards,
+	//why repeat code for backpropagation? Instead make a simple class that 
+	//combines inputs, calls a function on that aggregate, and outputs the 
+	//result to all outputs. Is this valid for all InputOperator gradients?
+	//For a multiplicative InputOperator (that couples the gradients), it 
+	//might be necessary to have an OutputOperator. 
+	
+	template<void (*InputOperator)(double, double&), 
+			 double (*ActivationFunction)(double),
+			 double (*OutputOperator)(double, double)>
 	class Neuron_base {
 	/*
 		The Neuron_base class is responsible for managing the various 
 		ben::Node objects used by a neuron to communicate with other 
 		neurons. The forward_node network transmits signals forward as
-		the network evaluates, the backprop_node transmits gradients
-		backward, and the info_node transmits information-theoretic value.
-		Neuron_base includes public methods for managing links and protected
-		utility methods for use by child classes. 
+		the network evaluates and the backprop_node transmits gradients
+		backward.
+
+		InputOperators should have the following signature:
+		void f(double signal, double& total) 
+		This allows for flexibility in combining signals.
 		
+		ActivationFunctions should have the following signature:
+		double [output] f(double state)
+
+		OutputOperators should have the following signature:
+		double [output] f(double activation, double 
+
 		This class handles the forward input function (dot product), but 
 		not the activation function. Most every neuron will need to store 
 		its forward output value for training, so this is included as a member. 
