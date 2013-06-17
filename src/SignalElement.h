@@ -27,12 +27,42 @@ namespace alex {
 	void sum_operator(T& total, T new_value) { total += new_value; }
 
 	template<typename T, 
-			 T (*ActivationFunction)(T), 
-			 void (*InputOperator)(T&, T)=sum_operator<T>
-			 T (*OutputOperator)()=nullptr >
-	struct SignalElement {
-		void pull(
+			 T (*ActivationFunction)(const T&), 
+			 void (*InputOperator)(T&, T)>
+	struct SignalElement_base {
+		ben::stdMessageNode<T, 1> node;
+		T collect(T bias) {
+			for(auto& port : node.inputs) (*InputOperator)(bias, port.pull());
+			return bias; //bias is already copied, so no need for a temp variable
+		}
+		T evaluate(const T& state) const { return (*ActivationFunction)(state); }
+		void distribute(const T& signal) {
+			for(auto& port : node.outputs) port.push(signal);
+		}
+	}; //class SignalElement_base
+
+
+	template<typename T, 
+			 T (*ActivationFunction)(const T&),
+			 T (*OutputOperator)(const T&, const T&)=nullptr,
+			 void (*InputOperator)(T&, T)=sum_operator<T> >
+	struct SignalElement : public SignalElement_base<T, ActivationFuction, InputOperator> {
+		void distribute(const T& signal) { //overrides SignalElement_base::distribute
+			T temp;
+			for(auto& port : node.outputs) {
+				temp = (*OutputOperator)(signal, port.old_signal()); //needs old_signal access
+				port.push(temp);
+			}
+		}
 	}; //class SignalElement
+
+
+	template<typename T, 
+			 T (*ActivationFunction)(const T&),
+			 void (*InputOperator)(T&, T)=sum_operator<T> >
+	struct SignalElement<T, ActivationFunction, nullptr, InputOperator> 
+		: public SignalElement_base<T, ActivationFuction, InputOperator> {
+	}; //class SignalElement, no output operator
 
 } //namespace alex
 
