@@ -28,43 +28,45 @@ namespace alex {
 	template<typename T>
 	void sum_operator(T& total, T new_value) { total += new_value; }
 
-	template<typename T, 
-			 void (*InputOperator)(T&, T)>
-	struct SignalPropagator_base {
 
-		ben::stdMessageNode<T, 1> node;
+	template<typename T, void (*F)(T&, T)>
+	struct InputFunctor {
+		void operator()(T& total, T value) { (*F)(total, value); }
+	};
 
-		T collect(T bias) {
-			for(auto& port : node.inputs) (*InputOperator)(bias, port.pull());
+
+	template<typename LINK, typename INPUTOPERATOR = InputFunctor<typename LINK::signal_type, 
+																  sum_operator<typename LINK::signal_type> > >
+	struct SignalPropagator {
+		typedef typename LINK::signal_type signal_type;
+		ben::stdMessageNode<signal_type> node;
+
+		signal_type collect(signal_type bias) {
+			for(auto& port : node.inputs) INPUTOPERATOR(bias, port.pull());
 			return bias; //bias is already copied, so no need for a temp variable
 		}
 
-		void distribute(const T& signal) {
+		void distribute(const signal_type& signal) {
 			for(auto& port : node.outputs) port.push(signal);
-		}
-	}; //class SignalPropagator_base
-
-
-	template<typename T, 
-			 T (*OutputOperator)(const T&, const T&),
-			 void (*InputOperator)(T&, T)=sum_operator<T> >
-	struct SignalPropagator : public SignalPropagator_base<T, InputOperator> {
-		typedef SignalPropagator_base<T, InputOperator> base_type;
-		void distribute(const T& signal) { //overrides SignalPropagator_base::distribute
-			T temp;
-			for(auto& port : base_type::node.outputs) {
-				temp = (*OutputOperator)(signal, port.old_signal()); //needs old_signal access
-				port.push(temp);
-			}
 		}
 	}; //class SignalPropagator
 
 
-	//why not use different names depending on whether an OutputOperator is needed?
-	template<typename T, void (*InputOperator)(T&, T)>
-	struct SignalPropagator<T, nullptr, InputOperator> 
-		: public SignalPropagator_base<T, InputOperator> {
-	}; //class SignalPropagator, no output operator
+	template<typename LINK, typename OUTPUTOPERATOR,
+			 typename INPUTOPERATOR = InputFunctor<typename LINK::signal_type, 
+												   sum_operator<typename LINK::signal_type> > >
+	struct ErrorPropagator : public SignalPropagator<LINK, INPUTOPERATOR> {
+		typedef SignalPropagator<LINK, INPUTOPERATOR> base_type;
+		typedef typename base_type::signal_type signal_type;
+
+		void distribute(const signal_type& signal) { //overrides SignalPropagator::distribute
+			signal_type temp;
+			for(auto& port : base_type::node.outputs) {
+				temp = OUTPUTOPERATOR(signal, port.old_signal()); //needs old_signal access
+				port.push(temp);
+			}
+		}
+	}; //class ErrorPropagator
 
 } //namespace alex
 
