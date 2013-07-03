@@ -46,12 +46,13 @@ namespace alex {
 
 
 	template<typename T, 
-			 T (*OutputOperator)(const T&, const T&)=nullptr,
+			 T (*OutputOperator)(const T&, const T&),
 			 void (*InputOperator)(T&, T)=sum_operator<T> >
-	struct SignalPropagator : public SignalPropagator_base<T, ActivationFuction, InputOperator> {
+	struct SignalPropagator : public SignalPropagator_base<T, InputOperator> {
+		typedef SignalPropagator_base<T, InputOperator> base_type;
 		void distribute(const T& signal) { //overrides SignalPropagator_base::distribute
 			T temp;
-			for(auto& port : node.outputs) {
+			for(auto& port : base_type::node.outputs) {
 				temp = (*OutputOperator)(signal, port.old_signal()); //needs old_signal access
 				port.push(temp);
 			}
@@ -59,10 +60,10 @@ namespace alex {
 	}; //class SignalPropagator
 
 
-	template<typename T, 
-			 void (*InputOperator)(T&, T)=sum_operator<T> >
+	//why not use different names depending on whether an OutputOperator is needed?
+	template<typename T, void (*InputOperator)(T&, T)>
 	struct SignalPropagator<T, nullptr, InputOperator> 
-		: public SignalPropagator_base<T, ActivationFuction, InputOperator> {
+		: public SignalPropagator_base<T, InputOperator> {
 	}; //class SignalPropagator, no output operator
 
 } //namespace alex
