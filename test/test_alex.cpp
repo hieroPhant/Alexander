@@ -22,19 +22,22 @@
 //	g++ -std=c++0x -g -I../src -I../Benoit/src -lpugixml -lAlexander test_alex.cpp -o test_alex
 //	./test_alex
 
-#include "Alexander.h"
 #include <iostream>
+#include "gtest/gtest.h"
+#include "SignalPropagator.h"
 
-int main() {
-	
-	using namespace std;
-	using namespace pugi;
-	using namespace alex;
-	
-	const char file[] = "test_network.xml";
-	
-	NeuralNet network(file);
-	
-	return 0;
+namespace {
+
+	class SignalPropagators : public ::testing::Test {
+	}; 
+
+	TEST_F(SignalPropagators, All) {
+		EXPECT_TRUE(true);
+	}	
+}
+
+int main(int argc, char **argv) {
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
 }
 
