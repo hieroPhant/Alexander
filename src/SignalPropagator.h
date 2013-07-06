@@ -40,9 +40,10 @@ namespace alex {
 	struct SignalPropagator {
 		typedef typename LINK::signal_type signal_type;
 		ben::stdMessageNode<signal_type> node;
+		INPUTOPERATOR input_op;
 
 		signal_type collect(signal_type bias) {
-			for(auto& port : node.inputs) INPUTOPERATOR(bias, port.pull());
+			for(auto& port : node.inputs) input_op(bias, port.pull());
 			return bias; //bias is already copied, so no need for a temp variable
 		}
 
@@ -58,11 +59,12 @@ namespace alex {
 	struct ErrorPropagator : public SignalPropagator<LINK, INPUTOPERATOR> {
 		typedef SignalPropagator<LINK, INPUTOPERATOR> base_type;
 		typedef typename base_type::signal_type signal_type;
+		OUTPUTOPERATOR output_op;
 
 		void distribute(const signal_type& signal) { //overrides SignalPropagator::distribute
 			signal_type temp;
 			for(auto& port : base_type::node.outputs) {
-				temp = OUTPUTOPERATOR(signal, port.old_signal()); //needs old_signal access
+				temp = output_op(signal, port.old_signal()); //needs old_signal access
 				port.push(temp);
 			}
 		}
@@ -71,3 +73,4 @@ namespace alex {
 } //namespace alex
 
 #endif
+

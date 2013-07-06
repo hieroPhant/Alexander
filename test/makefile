@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -std=c++11 -g -march=native
-PFLAGS = -lgtest
+PFLAGS = -lgtest -lboost_system
 SRC = ../src
 BEN = ../Benoit
 PATHS = -I$(SRC) -I$(BEN) -I$(BEN)/src

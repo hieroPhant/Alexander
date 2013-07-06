@@ -23,16 +23,28 @@
 //	./test_alex
 
 #include <iostream>
+#include "Benoit.h"
 #include "gtest/gtest.h"
 #include "SignalPropagator.h"
 
 namespace {
 
 	class SignalPropagators : public ::testing::Test {
+	public:
+		alex::SignalPropagator< ben::Buffer<double,1> > in1, in2, out1;
+		SignalPropagators() {
+			out1.node.add_input(in1.node.ID());
+			out1.node.add_input(in2.node.ID());
+		}
+		//ErrorPropagator y;
 	}; 
 
 	TEST_F(SignalPropagators, All) {
-		EXPECT_TRUE(true);
+		double x=3, y=5, total=0;
+		//in1.distribute(x);
+		//in2.distribute(y);
+		//total = out1.collect(total);
+		EXPECT_EQ(total, x+y);
 	}	
 }
 
