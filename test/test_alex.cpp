@@ -23,29 +23,55 @@
 //	./test_alex
 
 #include <iostream>
-#include "Benoit.h"
 #include "gtest/gtest.h"
+#include "Benoit.h"
+#include "Graph.h"
+#include "DirectedNode.h"
 #include "SignalPropagator.h"
 
 namespace {
 
 	class SignalPropagators : public ::testing::Test {
 	public:
-		alex::SignalPropagator< ben::Buffer<double,1> > in1, in2, out1;
-		SignalPropagators() {
+		//note: need to simplify Benoit interface
+		typedef ben::Buffer<double, 1> link_type;
+		typedef alex::SignalPropagator<link_type> unit_type;
+		typedef ben::Graph<typename unit_type::node_type> graph_type;
+
+		std::shared_ptr<graph_type> graph_ptr;
+		unit_type in1, in2, out1;
+		SignalPropagators() : graph_ptr(std::make_shared<graph_type>()), in1(graph_ptr),
+	   						  in2(graph_ptr), out1(graph_ptr) {
 			out1.node.add_input(in1.node.ID());
 			out1.node.add_input(in2.node.ID());
+			out1.node.add_output(in1.node.ID());
+			out1.node.add_output(in2.node.ID());
 		}
-		//ErrorPropagator y;
 	}; 
 
 	TEST_F(SignalPropagators, All) {
 		double x=3, y=5, total=0;
-		//in1.distribute(x);
-		//in2.distribute(y);
-		//total = out1.collect(total);
-		EXPECT_EQ(total, x+y);
+		in1.distribute(x);
+		in2.distribute(y);
+		total = out1.collect(total);
+		EXPECT_EQ(x+y, total);
+
+		out1.distribute(total);
+		double new_total = 0;
+		new_total = in1.collect(new_total);
+		EXPECT_EQ(total, new_total);
 	}	
+
+	//define some outputoperator for testing purposes
+
+	class ErrorPropagators : public ::testing::Test {
+	public:
+		typedef ben::Buffer<double, 1> link_type;
+		//typedef alex::ErrorPropagator<link_type, > unit_type;
+		//typedef ben::Graph<typename unit_type::node_type> graph_type;
+
+		//std::shared_ptr<graph_type> graph_ptr;
+	};
 }
 
 int main(int argc, char **argv) {

@@ -22,6 +22,9 @@
 */
 
 #include "Benoit.h"
+#include "Port.h"
+#include "DirectedNode.h"
+#include "Graph.h"
 
 namespace alex {
 
@@ -39,8 +42,16 @@ namespace alex {
 																  sum_operator<typename LINK::signal_type> > >
 	struct SignalPropagator {
 		typedef typename LINK::signal_type signal_type;
-		ben::stdMessageNode<signal_type> node;
+		typedef ben::DirectedNode< ben::InPort<LINK>, ben::OutPort<LINK> > node_type;
+		typedef ben::Graph<node_type> graph_type;
+
+		node_type node;
 		INPUTOPERATOR input_op;
+
+		SignalPropagator() = delete;
+		template<typename... ARGS>
+		SignalPropagator(std::shared_ptr<graph_type> graph_ptr, ARGS... args) 
+			: node(graph_ptr), input_op(args...) {}
 
 		signal_type collect(signal_type bias) {
 			for(auto& port : node.inputs) input_op(bias, port.pull());
