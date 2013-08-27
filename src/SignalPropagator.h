@@ -42,16 +42,18 @@ namespace alex {
 
 		template<typename function_type>
 		void collect(function_type& function, signal_type& total) {
+			using namespace std;
+			signal_type signal;
 			for(auto& port : node.inputs) {
-				if(!port.is_ready()) {
-					using namespace std;
+				if(!port.pull(signal)) {
 					cerr << "Link " << port.get_address() << " -> " 
 						 << node.ID() << " was not ready." << endl;
 				}
-				function(port.pull(), total);
+				function(signal, total);
 			}
 		}
 		void distribute(const signal_type& signal) {
+			using namespace std;
 			for(auto& port : node.outputs) {
 				if(!port.push(signal)) {
 					cerr << "Link " << node.ID() << " -> "
