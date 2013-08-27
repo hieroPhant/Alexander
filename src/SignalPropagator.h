@@ -21,6 +21,7 @@
     e-mail: jackwhall7@gmail.com
 */
 
+#include <iostream>
 #include "Benoit.h"
 #include "Port.h"
 #include "DirectedNode.h"
@@ -28,58 +29,67 @@
 
 namespace alex {
 
-	template<typename T>
-	void sum_operator(T& total, T new_value) { total += new_value; }
-
-
-	template<typename T, void (*F)(T&, T)>
-	struct InputFunctor {
-		void operator()(T& total, T value) { (*F)(total, value); }
-	};
-
-
-	template<typename LINK, typename INPUTOPERATOR = InputFunctor<typename LINK::signal_type, 
-																  sum_operator<typename LINK::signal_type> > >
+	template<typename link_type>
 	struct SignalPropagator {
-		typedef typename LINK::signal_type signal_type;
-		typedef ben::DirectedNode< ben::InPort<LINK>, ben::OutPort<LINK> > node_type;
+		typedef typename link_type::signal_type signal_type;
+		typedef ben::DirectedNode< ben::InPort<link_type>, ben::OutPort<link_type> > node_type;
 		typedef ben::Graph<node_type> graph_type;
 
 		node_type node;
-		INPUTOPERATOR input_op;
 
-		SignalPropagator() = delete;
-		template<typename... ARGS>
-		SignalPropagator(std::shared_ptr<graph_type> graph_ptr, ARGS... args) 
-			: node(graph_ptr), input_op(args...) {}
+		explicit SignalPropagator(std::shared_ptr<graph_type> graph_ptr)
+			: node(graph_ptr) {}
 
-		signal_type collect(signal_type bias) {
-			for(auto& port : node.inputs) input_op(bias, port.pull());
-			return bias; //bias is already copied, so no need for a temp variable
-		}
-
-		void distribute(const signal_type& signal) {
-			for(auto& port : node.outputs) port.push(signal);
-		}
-	}; //class SignalPropagator
-
-
-	template<typename LINK, typename OUTPUTOPERATOR,
-			 typename INPUTOPERATOR = InputFunctor<typename LINK::signal_type, 
-												   sum_operator<typename LINK::signal_type> > >
-	struct ErrorPropagator : public SignalPropagator<LINK, INPUTOPERATOR> {
-		typedef SignalPropagator<LINK, INPUTOPERATOR> base_type;
-		typedef typename base_type::signal_type signal_type;
-		OUTPUTOPERATOR output_op;
-
-		void distribute(const signal_type& signal) { //overrides SignalPropagator::distribute
-			signal_type temp;
-			for(auto& port : base_type::node.outputs) {
-				temp = output_op(signal, port.old_signal()); //needs old_signal access
-				port.push(temp);
+		template<typename function_type>
+		void collect(function_type& function, signal_type& total) {
+			for(auto& port : node.inputs) {
+				if(!port.is_ready()) {
+					using namespace std;
+					cerr << "Link " << port.get_address() << " -> " 
+						 << node.ID() << " was not ready." << endl;
+				}
+				function(port.pull(), total);
 			}
 		}
-	}; //class ErrorPropagator
+		void distribute(const signal_type& signal) {
+			for(auto& port : node.outputs) {
+				if(!port.push(signal)) {
+					cerr << "Link " << node.ID() << " -> "
+						 << port.get_address() << " is already full." << endl;
+				}
+			}
+		}
+	};
+
+	template<typename link_type>
+	struct BackPropagator : public SignalPropagator<link_type> {
+		typedef typename SignalPropagator<link_type>::signal_type signal_type;
+		typedef typename SignalPropagator<link_type>::node_type node_type;
+		typedef typename SignalPropagator<link_type>::graph_type graph_type;
+
+		using SignalPropagator::node;
+		using SignalPropagator::SignalPropagator;
+		using SignalPropagator::collect;
+
+		template<typename iterator_type>
+		void distribute(iterator_type iter, iterator_type end) {
+			using namespace std;
+			for(auto& port : node.outputs) {
+				if(iter == end) {
+					cerr << "Not enough signals given for the outputs of "
+						 << node.ID() << "." << endl;
+					return;
+				}
+				if(!port.push(*iter)) {
+					cerr << "Link " << node.ID() << " -> "
+						 << port.get_address() << " is already full." << endl;
+				}
+				++iter;
+			}
+			if(iter != end) 
+				cerr << "More signals than outputs for " << node.ID() << "." << endl;
+		}
+	};
 
 } //namespace alex
 
