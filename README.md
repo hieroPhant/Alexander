@@ -16,3 +16,4 @@ The only other thing you'll need is a C++11 compatible compiler.
 Recent versions of clang, gcc, and MS Visual Studio should work. 
 You might have to pass '-std=c++11' as a flag to your compiler so it knows to use the new standard.
 
+There is more documentation on the [wiki](https://github.com/jackhall/Alexander/wiki).
