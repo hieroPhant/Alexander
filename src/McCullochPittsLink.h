@@ -1,5 +1,5 @@
-#ifndef Neuron_linear_h
-#define Neuron_linear_h
+#ifndef McCullochPittsLink_h
+#define McCullochPittsLink_h
 
 /*
     Alexander: a neural networks library
@@ -21,29 +21,37 @@
     e-mail: jackwhall7@gmail.com
 */
 
-#include "Neuron_base.h"
+#include <iostream>
+#include "Benoit.h"
 
 namespace alex {
+    
+    class McCullochPittsLink {
+        bool ready;
+        int signal;
 
-	class Neuron_linear : public Neuron_base {
-	private:
-		virtual data_type f(const data_type z) const;
-		virtual data_type df(const data_type z) const;
-		
-	public:
-		//constructors need work
-		Neuron_linear() = delete;
-		Neuron_linear(pugi::xml_node neuron,
-			      forward_index_type& fIndex,
-			      backprop_index_type& bIndex);
-		Neuron_linear(forward_index_type& fIndex, backprop_index_type& bIndex);
-		Neuron_linear(const Neuron_linear& rhs) = default; //delete this
-		Neuron_linear(Neuron_linear&& rhs);
-		Neuron_linear& operator=(const Neuron_linear& rhs) = default; //delete this
-		Neuron_linear& operator=(Neuron_linear&& rhs) = default;
-		~Neuron_linear() = default;
-	}; //class Neuron_linear
-	
+    public:
+        int weight; 
+
+        McCullochPittsLink() : ready(false), signal(0), weight(0) {}
+
+        bool pull(int& output) {
+            if(ready) {
+                output = signal*weight; 
+                ready = false;
+                return true;
+            } else return false;
+        }
+
+        bool push(int input) {
+            if(!ready) {
+                signal = input;
+                ready = true;
+                return true;
+            } else return false;
+        }
+    };
+
 } //namespace alex
 
 #endif
