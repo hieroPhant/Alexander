@@ -33,7 +33,6 @@ namespace {
 
 	class SignalPropagators : public ::testing::Test {
 	public:
-		//note: need to simplify Benoit interface
 		typedef ben::Buffer<double, 1> link_type;
 		typedef alex::SignalPropagator<link_type> unit_type;
 		typedef ben::Graph<typename unit_type::node_type> graph_type;
@@ -49,16 +48,18 @@ namespace {
 		}
 	}; 
 
+    void sum(double& total, double signal) { total += signal; }
+
 	TEST_F(SignalPropagators, All) {
 		double x=3, y=5, total=0;
 		in1.distribute(x);
 		in2.distribute(y);
-		total = out1.collect(total);
+		out1.collect(sum, total);
 		EXPECT_EQ(x+y, total);
 
 		out1.distribute(total);
 		double new_total = 0;
-		new_total = in1.collect(new_total);
+		in1.collect(sum, new_total);
 		EXPECT_EQ(total, new_total);
 	}	
 

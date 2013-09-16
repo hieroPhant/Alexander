@@ -33,7 +33,10 @@ namespace alex {
     public:
         int weight; 
 
-        McCullochPittsLink() : ready(false), signal(0), weight(0) {}
+        McCullochPittsLink(bool excitatory) : ready(false), signal(0) {
+            if(excitatory) weight = 1;
+            else weight = -1;
+        }
 
         bool pull(int& output) {
             if(ready) {

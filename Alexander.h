@@ -3,7 +3,7 @@
 
 /*
     Alexander: a neural networks library
-    Copyright (C) 2011-2012  Jack Hall
+    Copyright (C) 2011-2013  Jack Hall
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,33 +21,10 @@
     e-mail: jackwhall7@gmail.com
 */
 
-#include <utility>
-#include <pugixml.hpp>
-#include "Benoit.h"
-
-namespace alex {
-
-	typedef unsigned int				ID_type;
-
-	//forward connections
-	typedef float 					data_type; 
-	typedef ben::Node<data_type, data_type> 	forward_node_type;
-	typedef ben::Index<data_type, data_type> 	forward_index_type;
-	
-	//backpropagation connections
-	typedef std::pair<data_type,bool> 		delta_type; 
-	typedef ben::Node<delta_type, data_type> 	backprop_node_type;
-	typedef ben::Index<delta_type, data_type> 	backprop_index_type;
-	
-} //namespace alex
-
-#ifndef Neuron_base_h
-#include "Neuron_base.h"
-#include "Neuron_input.h"
-#include "Neuron_linear.h"
-#include "Neuron_sigmoid.h"
-#include "NeuralNet.h"
-#endif
+#include "Benoit/Benoit.h"
+#include "src/SignalPropagator.h"
+#include "src/McCullochPittsLink.h"
+#include "src/McCullochPittsNeuron.h"
 
 #endif
 

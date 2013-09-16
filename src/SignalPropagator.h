@@ -49,7 +49,7 @@ namespace alex {
 					cerr << "Link " << port.get_address() << " -> " 
 						 << node.ID() << " was not ready." << endl;
 				}
-				function(signal, total);
+				function(total, signal);
 			}
 		}
 		void distribute(const signal_type& signal) {
@@ -69,9 +69,9 @@ namespace alex {
 		typedef typename SignalPropagator<link_type>::node_type node_type;
 		typedef typename SignalPropagator<link_type>::graph_type graph_type;
 
-		using SignalPropagator::node;
-		using SignalPropagator::SignalPropagator;
-		using SignalPropagator::collect;
+		using SignalPropagator<link_type>::node;
+		using SignalPropagator<link_type>::SignalPropagator;
+		using SignalPropagator<link_type>::collect;
 
 		template<typename iterator_type>
 		void distribute(iterator_type iter, iterator_type end) {

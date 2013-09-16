@@ -23,31 +23,57 @@
 
 #include <iostream>
 #include "SignalPropagator.h"
+#include "McCullochPittsLink.h"
 
 namespace alex {
 
-    void sum(int stimulus, int& total_stimulus) { total_stimulus += stimulus; }
+    void sum(int& total_stimulus, int stimulus) { total_stimulus += stimulus; }
 
     class McCullochPittsNeuron {
         typedef SignalPropagator<McCullochPittsLink> propagator_type;
-        typedef typename propagator_type::graph_type graph_type;
+        typedef McCullochPittsNeuron self_type;
         propagator_type propagator;
 
     public:
-        int bias, threshold;
+        typedef typename propagator_type::graph_type graph_type;
 
-        McCullochPittsNeuron(std::shared_ptr<graph_type> graph_ptr) 
-            : propagator(graph_ptr), bias(0.0), threshold(1) {}
+        int threshold;
 
-        void execute() {
+        McCullochPittsNeuron(std::shared_ptr<graph_type> graph_ptr, new_threshold) 
+            : propagator(graph_ptr), threshold(new_threshold) {}
+
+        bool execute() {
+            //this overload is for non-input neurons
             //draw in signals
-            int total_stimulus = bias;
+            int total_stimulus = 0;
             propagator.collect(sum, total_stimulus);
-            if(total_stimulus > threshold) {
+
+            //delegating sending
+            return execute(total_stimulus);
+        }
+
+        bool execute(int stimulus) {
+            //this overload is for input neurons
+            //compare with threshold and push out the result
+            if(total_stimulus >= threshold) {
                 propagator.distribute(1);
+                return true;
             } else {
                 propagator.distribute(0);
+                return false;
             }
+        }
+
+        void add_input(const self_type& other, bool excitatory) {
+            auto otherID = other.propagator.node.ID();
+            if( !propagator.node.add_input(otherID, excitatory) ) 
+                std::cerr << "Adding link between " << otherID << " and " 
+                          << ID() << " failed." << std::endl;
+        }
+
+        void remove_input(const self_type& other) {
+            auto otherID = other.propagator.node.ID();
+            propagator.node.remove_input(otherID);
         }
     };
 
