@@ -31,7 +31,9 @@ namespace alex {
         int signal;
 
     public:
+        typedef int signal_type;
         int weight; 
+        typedef ben::ConstructionTypes<bool> construction_types;
 
         McCullochPittsLink(bool excitatory) : ready(false), signal(0) {
             if(excitatory) weight = 1;

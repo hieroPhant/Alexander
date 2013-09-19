@@ -39,7 +39,7 @@ namespace alex {
 
         int threshold;
 
-        McCullochPittsNeuron(std::shared_ptr<graph_type> graph_ptr, new_threshold) 
+        McCullochPittsNeuron(std::shared_ptr<graph_type> graph_ptr, int new_threshold) 
             : propagator(graph_ptr), threshold(new_threshold) {}
 
         bool execute() {
@@ -55,7 +55,7 @@ namespace alex {
         bool execute(int stimulus) {
             //this overload is for input neurons
             //compare with threshold and push out the result
-            if(total_stimulus >= threshold) {
+            if(stimulus >= threshold) {
                 propagator.distribute(1);
                 return true;
             } else {
@@ -68,7 +68,7 @@ namespace alex {
             auto otherID = other.propagator.node.ID();
             if( !propagator.node.add_input(otherID, excitatory) ) 
                 std::cerr << "Adding link between " << otherID << " and " 
-                          << ID() << " failed." << std::endl;
+                          << propagator.node.ID() << " failed." << std::endl;
         }
 
         void remove_input(const self_type& other) {

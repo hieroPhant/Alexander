@@ -1,6 +1,6 @@
 /*
     Alexander: a neural networks library
-    Copyright (C) 2011-2012  Jack Hall
+    Copyright (C) 2011-2013  Jack Hall
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,14 +23,15 @@
 
 struct XORNetwork {
     typedef alex::McCullochPittsNeuron neuron_type;
+    typedef typename neuron_type::graph_type graph_type;
     std::shared_ptr<typename neuron_type::graph_type> graph_ptr;
 
     neuron_type inputA, inputB, hiddenOR, hiddenAND, output;
 
-    XORNetwork() : 
-        : graph_ptr(new neuron_type::graph_type), 
+    XORNetwork()  
+        : graph_ptr(new graph_type), 
           inputA(graph_ptr, 1), inputB(graph_ptr, 1),
-          hiddenOR(graph_ptr, 1), hiddenAND(graph_ptr, 2) 
+          hiddenOR(graph_ptr, 1), hiddenAND(graph_ptr, 2),
           output(graph_ptr, 1) {
         hiddenOR.add_input(inputA, true);
         hiddenOR.add_input(inputB, true);
