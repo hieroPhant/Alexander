@@ -21,6 +21,13 @@
 #include <iostream>
 #include "Alexander.h"
 
+//To compile, use:
+//    make test_xor
+//in this directory. To run, use:
+//    ./test_xor
+//If the makefile doesn't work right off the bat, modify it as necessary for your system.
+//If you run Windows, do yourself a favor and look up Cygwin. Otherwise, good luck.
+
 struct XORNetwork {
     //A network meant to demonstrate Alexander and Benoit. Acts like
     //an XOR function. Because all values are discrete, no gradients 
