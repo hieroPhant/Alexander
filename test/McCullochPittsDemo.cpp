@@ -22,34 +22,53 @@
 #include "Alexander.h"
 
 struct XORNetwork {
+    //A network meant to demonstrate Alexander and Benoit. Acts like
+    //an XOR function. Because all values are discrete, no gradients 
+    //are computed and there is no backpropagation. 
+    
     typedef alex::McCullochPittsNeuron neuron_type;
     typedef typename neuron_type::graph_type graph_type;
+
+    //To create neurons, you need a Graph handle.
     std::shared_ptr<typename neuron_type::graph_type> graph_ptr;
 
+    //Two input neurons, two hidden neurons, and an output neuron.
+    //You can think of each hidden neuron as representing a logical
+    //function, the combination of which is the output. I them up
+    //to act as an AND and an OR, but there are several equivalent 
+    //ways to get an XOR. 
     neuron_type inputA, inputB, hiddenOR, hiddenAND, output;
 
+    //Sets up the network, including the Graph.
     XORNetwork()  
         : graph_ptr(new graph_type), 
           inputA(graph_ptr, 1), inputB(graph_ptr, 1),
-          hiddenOR(graph_ptr, 1), hiddenAND(graph_ptr, 2),
+          hiddenOR(graph_ptr, 1), hiddenAND(graph_ptr, 2), 
           output(graph_ptr, 1) {
+        //The hidden neurons are identical aside from their thresholds.
         hiddenOR.add_input(inputA, true);
         hiddenOR.add_input(inputB, true);
         hiddenAND.add_input(inputA, true);
         hiddenAND.add_input(inputB, true);
+        //XOR(A,B) = OR(A,B) && ~AND(A,B)
         output.add_input(hiddenOR, true);
         output.add_input(hiddenAND, false);
     }
 
     bool execute(bool A, bool B) {
+        //Have each neuron execute in the proper order, and return the
+        //answer.
+        //The order in which the input neurons are executed doesn't matter.
         if(A) inputA.execute(1);
         else  inputA.execute(0);
 
         if(B) inputB.execute(1);
         else  inputB.execute(0);
 
+        //The order in which the hidden neurons are executed doesn't matter.
         hiddenOR.execute();
         hiddenAND.execute();
+
         return output.execute();
     }
 };
@@ -57,7 +76,10 @@ struct XORNetwork {
 int main() {
     using namespace std;
 
+    //Create the network.
     XORNetwork net;
+
+    //Display a test.
     cout << "A XOR B -> C" << endl << endl;
     cout << "A  B  C" << endl;
     cout << "0  0  " << net.execute(false, false) << endl;
