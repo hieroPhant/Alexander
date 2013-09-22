@@ -7,7 +7,9 @@ It also makes contributing to Alexander easier, if you were interested in doing 
 
 Alexander distributes with Benoit as a submodule. 
 Benoit is another C++ that can represent message-passing networks. 
-If you cloned Alexander to install, you will need to go to the Benoit directory and perform a git pull to get a copy. 
+If you cloned Alexander to install, you will need to either:
+* go to the Benoit directory and perform a "git pull" to get a copy 
+* perform a "git submodule update --init" from Alexander's root directory
 
 Alexander and Benoit are header-only libraries, so using them is as simple as putting the proper #include statements at the beginning of a file. 
 Note that you will have to add Alexander/src and Alexander/Benoit/src to your include path so the compiler can find them.
