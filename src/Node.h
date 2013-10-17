@@ -2,114 +2,148 @@
 #define AlexanderNode_h
 
 #include <memory>
-#include <mutex>
+//#include <mutex>
+
+//locking should be safe, but will block
+//look into using std::timed_mutex and std::lock to avoid blocking
 
 namespace alex {
 
-    template<typename LINK, bool IN> List;
+    template<typename LINK, bool IN> ArcList;
 
     template<typename LINK>
     struct Linker {
-        //inherit from Head?
-        List<LINK, true>* target;
-        List<LINK, false>* source;
-        std::mutex ptr_mutex;
-        Linker* next_input, next_output;
+        ArcList<LINK, true>* target;
+        ArcList<LINK, false>* source;
+        //std::mutex ptr_mutex;
+        Linker* next_input;
+        Linker* next_output;
         LINK link;
 
         template<typename... ARGS> 
-        Linker(List<LINK,false>& from, List<LINK,true>& to, ARGS... args) 
-            : target(&to), source(&from), next_input(nullptr), next_output(nullptr), link(args...) {}
+        Linker(ArcList<LINK,false>& from, ArcList<LINK,true>& to, ARGS&&... args) 
+            : target(&to), source(&from), 
+              next_input(nullptr), next_output(nullptr), 
+              link(std::forward<ARGS>(args)...) {}
 
         template<typename... ARGS>
-        Linker(List<LINK,true>& to, List<LINK,false>& from, ARGS... args) 
-            : Linker(from, to, args...) {}
+        Linker(ArcList<LINK,true>& to, ArcList<LINK,false>& from, ARGS&&... args) 
+            : Linker(from, to, std::forward<ARGS>(args)...) {}
     };
 
 
     template<typename LINK, bool IN>
-    class List {
+    class ArcList {
         class iterator;
 
-        std::mutex head_mutex;
+        //std::mutex arclist_mutex;
         Linker<LINK>* first_link;
-        void join(Linker<LINK>* new_linker) {
-            iterator iter(new_linker);
-            iter.me() = this;
-            iter.next() = first_link;
-            first_link = new_linker;
-        }
-        void break_next(iterator iter) {
-            auto trail = iter++;
-            trail.next() = iter.next();
-            clean(iter);
-        }
-        void clean(iterator iter) {
-            iter.me() = nullptr;
-            if(iter.other() == nullptr) delete &(*iter);
-            else {
-                //search other list and remove
+
+        bool clone(const ArcList& model) {
+            //std::lock_guard<std::mutex> lock(model.arclist_mutex);
+            for(auto iter=model.begin(); bool(iter); ++iter) {
+                //iter->ptr_mutex.lock();
+                if(iter.other()) link(*iter.other(), iter->link);
+                //iter->ptr_mutex.unlock();
             }
         }
-        template<typename FUNCTION>
-        iterator search(iterator iter, FUNCTION f) {
-            if(!bool(iter) || f(iter)) return iter;
-            else return search(++iter, f);
+        void join(Linker<LINK>* x) {
+            iterator iter(x);
+            //std::lock_guard<std::mutex> lock(arclist_mutex);
+            iter.me() = this;
+            iter.next() = first_link;
+            first_link = x;
         }
-        template<typename FUNCTION>
-        iterator trail_search(iterator iter, FUNCTION f) {
+        void clean(iterator iter) {
+            typedef typename ArcList<LINK, not IN>::iterator matching_iterator_type;
+            //iter->ptr_mutex.lock();
+            iter.me() = nullptr;
+            auto linker_ptr = &(*iter);
+            auto other_ptr = iter.other();
+            if(iter.other() == nullptr) {
+                //iter->ptr_mutex.unlock();
+                delete linker_ptr;
+            }
+            else {
+                //other.arclist_mutex.lock();
+                //iter->ptr_mutex.unlock();
+                iter.other()->unlink([linker_ptr](matching_iterator_type matching_iter) {
+                    return linker_ptr == &(*matching_iter); 
+                });
+            }
+        }
+        template<typename PREDICATE>
+        void unlink(PREDICATE p) {
+            auto iter = begin();
+            if(p(iter)) first_link = iter.next();
+            else {
+                iter = trail_search(iter, [&other](iterator it) {
+                    //std::lock_guard<std::mutex> lock(it->ptr_mutex);
+                    return it.other() == &other; });
+                auto trail = iter++;
+                trail.next() = iter.next();
+            }
+            //arclist_mutex.unlock(); //originally locked by caller
+            clean(iter);
+        }
+        template<typename PREDICATE>
+        iterator trail_search(iterator iter, PREDICATE p) {
             auto trail = iter++;
-            if(!bool(iter) || f(iter)) return trail;
-            else return trail_search(iter, f);
+            if(!bool(iter)) return iter; 
+            else if(f(iter)) return trail;
+            else return trail_search(iter, p);
         }
-        template<typename FUNCTION>
-        FUNCTION for_each_linker(FUNCTION f) {
-            for(iterator iter(first_link); bool(iter); ++iter)
-                f(*iter);
-            return f;
-        }
+        iterator begin() { return iterator(first_link); }
         
     public:
-        List() : first_link(nullptr) {}
-        List& List(const List& rhs);
-        List& operator=(const List& rhs);
-        ~List() { unlink_all(); }
+        ArcList() : first_link(nullptr) {}
+        ArcList& ArcList(const ArcList& rhs) : ArcList() { clone(rhs); }
+        ArcList& operator=(const ArcList& rhs) {
+            if(&rhs != this) {
+                unlink_all();
+                clone(rhs);
+            }
+            return *this;
+        }
+        ~ArcList() { unlink_all(); }
 
-        template<typename FUNCTION> for_each(FUNCTION f) const {
-            for_each_linker([&f](Linker<LINK>& linker) { f(linker.link); });
+        template<typename FUNCTION> FUNCTION for_each(FUNCTION f) const {
+            for(auto iter=begin(); bool(iter); ++iter)
+                f(iter->link);
             return f;
         }
 
         template<typename... ARGS> 
-        bool link(List<LINK, not IN>& other, ARGS... args) {
+        bool link(ArcList<LINK, not IN>& other, ARGS&&... args) {
             if(linked_to(other)) return false;
-            auto linker = new Linker(*this, other, args...);
+            auto linker = new Linker(*this, other, std::forward<ARGS>(args)...);
             join(linker);
             other.join(linker);
         }
-        bool clone(const List& model); //use copy constructor for this?
-        void unlink(List<LINK, not IN>& other) {
-            iterator iter(first_link);
-            if(iter.other() == &other) {
-                first_link = iter.next();
-                clean(iter);
-                return;
-            }
-            for(auto trail=iter++; bool(iter); trail=iter++) {
-                if(iter.other() == &other) {
-                    break_next(trail);
-                    return;
-                }
-            }
+        void unlink(ArcList<LINK, not IN>& other) {
+            //arclist_mutex.lock(); //gets unlocked inside unlink delegate
+            unlink([&other](iterator iter) { 
+                //std::lock_guard<std::mutex> lock(iter->ptr_mutex);
+                return iter.other() == &other; 
+            });
         }
-        void unlink_all();
+        void unlink_all() {
+            //arclist_mutex.lock();
+            auto iter = begin();
+            first_link = nullptr;
+            //arclist_mutex.unlock();
+            for(; bool(iter); ++iter) clean(iter);
+        }
 
-        bool linked_to(const List<LINK, not IN>& other) const {
-            return bool(search(iterator(first_link), [other](iterator iter) {
+        bool linked_to(const ArcList<LINK, not IN>& other) const {
+            //std::lock_guard<std::mutex> lock(arclist_mutex);
+            return bool(trail_search(iterator(first_link), [other](iterator iter) {
+                //std::lock_guard<std::mutex> lock(iter->ptr_mutex);
                 return iter.other() == &other; }));
         }
         size_t size() const {
             size_t count = 0;
+            //std::lock_guard<std::mutex> lock(arclist_mutex);
             for_each([&count](const Linker<LINK>&) { ++count; });
             return count;
         }
@@ -117,14 +151,14 @@ namespace alex {
 
 
     template<typename LINK, bool IN>
-    class List<LINK, IN>::iterator {
+    class ArcList<LINK, IN>::iterator {
         Linker<LINK>* current;
 
         Linker<LINK>*& next_impl(std::true_type) { return current->next_input; }
         Linker<LINK>*& next_impl(std::false_type) { return current->next_output; }
 
-        List<LINK, not IN>* list_ref(std::true_type) { return current->source; }
-        List<LINK, not IN>* list_ref(std::false_type) { return current->target; }
+        ArcList<LINK, not IN>* list_ref(std::true_type) { return current->source; }
+        ArcList<LINK, not IN>* list_ref(std::false_type) { return current->target; }
 
     public:
         iterator() : current(nullptr) {}
@@ -137,63 +171,44 @@ namespace alex {
         Linker<LINK>& operator*() { return *current; }
         Linker<LINK>* operator->() { return current; }
 
-        bool operator==(const iterator& other) const { return current == other.current; }
-        bool operator!=(const iterator& other) const { return !(*this == other); }
-
         Linker<LINK>*& next() { return next_impl(IN); }
-        List<LINK, not IN>* other() { return list_ref(IN); }
-        List<LINK, not IN>*& me() { return list_ref(not IN); }
+        ArcList<LINK, not IN>* other() { return list_ref(IN); }
+        ArcList<LINK, not IN>*& me() { return list_ref(not IN); }
+    };
+
+
+    template<typename LINK>
+    struct rawNode { 
+        ArcList<LINK,true> inputs; 
+        ArcList<LINK,false> outputs; 
     };
 
 
     template<typename LINK>
     class Node {
-        //unique_ptrs would require deletion of copy and assignment
-        struct Links { Head<true> inputs; Head<false> outputs; };
-        std::shared_ptr<Links> links;
+        //unique_ptr would require deletion of copy ctor and assignment op
+        std::shared_ptr< rawNode<LINK> > links;
 
     public:
-        template<typename FUNCTION>
-        FUNCTION Node::for_inputs(FUNCTION f) const;
-        template<typename FUNCTION>
-        FUNCTION Node::for_outputs(FUNCTION f) const;
+        Node() : links(new rawNode<LINK>()) {}
 
-        template<typename... ARGS> bool link(Node& source, ARGS... args);
-        bool mirror(const Node& other);
-        void unlink_all();
+        template<typename FUNCTION>
+        FUNCTION for_inputs(FUNCTION f) const { return links->inputs.for_each(f); }
+        template<typename FUNCTION>
+        FUNCTION for_outputs(FUNCTION f) const { return links->outputs.for_each(f); }
+
+        template<typename... ARGS> bool link(Node& source, ARGS&&... args) {
+            return links->inputs.link(source.links->outputs, std::forward<ARGS>(args)...);
+        }
+        void mirror(const Node& other) { links->inputs = other.links->inputs; }
+        void unlink(const Node& source) { links->inputs.unlink(source.links->outputs); }
+        void unlink_all() { links->inputs.unlink_all(); }
         
-        bool linked_to(const Node& other) const;
-        size_t size() const;
+        bool linked_to(const Node& other) const { 
+            return links->inputs.linked_to(other.links->outputs); 
+        }
+        size_t size() const { return links->inputs.size(); }
     };
-
-    template<typename LINK> template<typename FUNCTION> 
-    FUNCTION Node<LINK>::for_inputs(FUNCTION f) const {
-        
-        auto traverse = [f](Linker& linker) {
-            f(linker.link);
-            if(!linker.next_input) return f;
-            return traverse(*linker.next_input);
-        };
-        return traverse(*input_head, f);
-    }
-    template<typename LINK> template<typename FUNCTION> 
-    FUNCTION Node<LINK>::for_outputs(FUNCTION f) const {
-        auto traverse = [f](Linker& linker) {
-            f(linker.link);
-            if(!linker.next_output) return f;
-            return traverse(*linker.next_output);
-        };
-        return traverse(*output_head, f);
-    }
-    template<typename LINK> 
-    template<typename... ARGS> 
-    bool Node<LINK>::emplace_link(Node& source, ARGS... args) {}
-    template<typename LINK> bool Node<LINK>::mirror(const Node& other) {}
-    template<typename LINK> void Node<LINK>::unlink(Node& source) {}
-    template<typename LINK> void Node<LINK>::unlink_all() {}
-    template<typename LINK> bool Node<LINK>::linked_to(const Node& other) const {}
-    template<typename LINK> size_t Node<LINK>::size() const {}
-
 } 
 
 #endif
