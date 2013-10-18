@@ -9,7 +9,7 @@
 
 namespace alex {
 
-    template<typename LINK, bool IN> ArcList;
+    template<typename LINK, bool IN> class ArcList;
 
     template<typename LINK>
     struct Linker {
@@ -48,6 +48,7 @@ namespace alex {
         //between nodes. Because input and output ArcLists have different types, 
         //it is impossible to make a link between two input or two output ArcLists.
         class iterator;
+        friend class ArcList<LINK, not IN>;
 
         //std::mutex arclist_mutex;
         Linker<LINK>* first_link;
@@ -57,7 +58,7 @@ namespace alex {
             //If an analagous link already exists, leave it. Otherwise,
             //use LINK's copy constructor.
             //std::lock_guard<std::mutex> lock(model.arclist_mutex);
-            for(auto iter=model.begin(); bool(iter); ++iter) {
+            for(auto iter=model.begin(); iter; ++iter) {
                 //iter->ptr_mutex.lock();
                 if(iter.other()) link(*iter.other(), iter->link);
                 //iter->ptr_mutex.unlock();
@@ -82,7 +83,7 @@ namespace alex {
             iter.me() = nullptr;
             auto linker_ptr = &(*iter);
             auto other_ptr = iter.other();
-            if(iter.other() == nullptr) {
+            if(!iter.other()) {
                 //iter->ptr_mutex.unlock();
                 delete linker_ptr;
             }
@@ -100,33 +101,21 @@ namespace alex {
             //alter the linked list to skip over it. Then call 'clean' to safely
             //destroy the Linker. 'unlink' is mutually recursive with 'clean'.
             auto iter = begin();
+            if(!iter) return;
             if(p(iter)) first_link = iter.next();
             else {
-                iter = trail_search(iter, [&other](iterator it) {
-                    //std::lock_guard<std::mutex> lock(it->ptr_mutex);
-                    return it.other() == &other; });
-                if(!bool(iter)) return;
-                auto trail = iter++;
-                trail.next() = iter.next();
+                for(auto trail=iter++; iter; trail=iter++)
+                    if(p(iter)) trail.next() = iter.next();
+                if(!iter) return;
             }
             //arclist_mutex.unlock(); //originally locked by caller
             clean(iter);
         }
-        template<typename PREDICATE>
-        iterator trail_search(iterator iter, PREDICATE p) {
-            //Find the first Linker that satisfies the given predicate, and
-            //return an iterator to the preceding element. If no links satisfy
-            //the predicate, return a null iterator;
-            auto trail = iter++;
-            if(!bool(iter)) return iter; 
-            else if(f(iter)) return trail;
-            else return trail_search(iter, p);
-        }
-        iterator begin() { return iterator(first_link); }
+        iterator begin() const { return iterator(first_link); }
         
     public:
         ArcList() : first_link(nullptr) {}
-        ArcList& ArcList(const ArcList& rhs) : ArcList() { clone(rhs); }
+        ArcList(const ArcList& rhs) : ArcList() { clone(rhs); }
         ArcList& operator=(const ArcList& rhs) {
             if(&rhs != this) {
                 unlink_all();
@@ -138,7 +127,7 @@ namespace alex {
 
         template<typename FUNCTION> FUNCTION for_each(FUNCTION f) const {
             //Call the given function or functor on each LINK.
-            for(auto iter=begin(); bool(iter); ++iter)
+            for(auto iter=begin(); iter; ++iter)
                 f(iter->link);
             return f;
         }
@@ -148,9 +137,10 @@ namespace alex {
             //After verifying that such a link does not already exist, construct
             //the new Linker object and call 'join' for 'this' and 'other'.
             if(linked_to(other)) return false;
-            auto linker = new Linker(*this, other, std::forward<ARGS>(args)...);
+            auto linker = new Linker<LINK>(*this, other, std::forward<ARGS>(args)...);
             join(linker);
             other.join(linker);
+            return true;
         }
         void unlink(ArcList<LINK, not IN>& other) {
             //If a link exists to 'other', destroy it. 
@@ -165,21 +155,25 @@ namespace alex {
             auto iter = begin();
             first_link = nullptr;
             //arclist_mutex.unlock();
-            for(; bool(iter); ++iter) clean(iter);
+            for(; iter; ++iter) clean(iter);
         }
 
         bool linked_to(const ArcList<LINK, not IN>& other) const {
             //Return true if a link to 'other' exists.
             //std::lock_guard<std::mutex> lock(arclist_mutex);
-            return bool(trail_search(iterator(first_link), [other](iterator iter) {
-                //std::lock_guard<std::mutex> lock(iter->ptr_mutex);
-                return iter.other() == &other; }));
+            for(auto iter=begin(); iter; ++iter) {
+                //iter->ptr_mutex.lock();
+                auto other_ptr = iter.other();
+                //iter->ptr_mutex.unlock();
+                if(other_ptr == &other) return true;
+            }
+            return false;
         }
         size_t size() const {
             //Count the current number of links.
             size_t count = 0;
             //std::lock_guard<std::mutex> lock(arclist_mutex);
-            for_each([&count](const Linker<LINK>&) { ++count; });
+            for_each([&count](const LINK&) { ++count; });
             return count;
         }
     };
@@ -196,23 +190,24 @@ namespace alex {
         Linker<LINK>*& next_impl(std::true_type) { return current->next_input; }
         Linker<LINK>*& next_impl(std::false_type) { return current->next_output; }
 
-        ArcList<LINK, not IN>* list_ref(std::true_type) { return current->source; }
-        ArcList<LINK, not IN>* list_ref(std::false_type) { return current->target; }
+        ArcList<LINK, false>*& list_ref(std::true_type) { return current->source; }
+        ArcList<LINK, true>*& list_ref(std::false_type) { return current->target; }
 
     public:
         iterator() : current(nullptr) {}
         explicit iterator(Linker<LINK>* linker_ptr) : current(linker_ptr) {}
 
         explicit operator bool() const { return current; }
+        bool operator!() const { return !current; }
         iterator& operator++() { current = next(); return *this; }
         iterator operator++(int) { auto temp = *this; current = next(); return temp; }
 
         Linker<LINK>& operator*() { return *current; }
         Linker<LINK>* operator->() { return current; }
 
-        Linker<LINK>*& next() { return next_impl(IN); }
-        ArcList<LINK, not IN>* other() { return list_ref(IN); }
-        ArcList<LINK, not IN>*& me() { return list_ref(not IN); }
+        Linker<LINK>*& next() { return next_impl(std::integral_constant<bool, IN>()); }
+        ArcList<LINK, not IN>* other() { return list_ref(std::integral_constant<bool, IN>()); }
+        ArcList*& me() { return list_ref(std::integral_constant<bool, not IN>()); }
     };
 
 
@@ -240,9 +235,9 @@ namespace alex {
         Node() : links(new rawNode<LINK>()) {}
 
         template<typename FUNCTION>
-        FUNCTION for_inputs(FUNCTION f) const { return links->inputs.for_each(f); }
+        FUNCTION for_each_input(FUNCTION f) const { return links->inputs.for_each(f); }
         template<typename FUNCTION>
-        FUNCTION for_outputs(FUNCTION f) const { return links->outputs.for_each(f); }
+        FUNCTION for_each_output(FUNCTION f) const { return links->outputs.for_each(f); }
 
         template<typename... ARGS> bool link(Node& source, ARGS&&... args) {
             return links->inputs.link(source.links->outputs, std::forward<ARGS>(args)...);

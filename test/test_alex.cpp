@@ -23,56 +23,84 @@
 //	./test_alex
 
 #include <iostream>
-#include "gtest/gtest.h"
-#include "Benoit.h"
-#include "Graph.h"
-#include "DirectedNode.h"
-#include "SignalPropagator.h"
+#include <gtest/gtest.h>
+#include "Node.h"
 
 namespace {
 
-	class SignalPropagators : public ::testing::Test {
-	public:
-		typedef ben::Buffer<double, 1> link_type;
-		typedef alex::SignalPropagator<link_type> unit_type;
-		typedef ben::Graph<typename unit_type::node_type> graph_type;
+    //It would be good to write explicit ArcList tests.
 
-		std::shared_ptr<graph_type> graph_ptr;
-		unit_type in1, in2, out1;
-		SignalPropagators() : graph_ptr(std::make_shared<graph_type>()), in1(graph_ptr),
-	   						  in2(graph_ptr), out1(graph_ptr) {
-			out1.node.add_input(in1.node.ID());
-			out1.node.add_input(in2.node.ID());
-			out1.node.add_output(in1.node.ID());
-			out1.node.add_output(in2.node.ID());
-		}
-	}; 
+	TEST(Node, All) {
+        //Refactor these tests into subroutines!
 
-    void sum(double& total, double signal) { total += signal; }
+        //test construction
+        alex::Node<double> in1, in2, out1;
+        EXPECT_EQ(0, out1.size());
 
-	TEST_F(SignalPropagators, All) {
+        //test link
+        EXPECT_TRUE(out1.link(in1));
+        EXPECT_TRUE(out1.linked_to(in1));
+        EXPECT_TRUE(out1.link(in2));
+        EXPECT_TRUE(out1.linked_to(in2));
+        EXPECT_EQ(2, out1.size());
+        EXPECT_TRUE(in1.link(out1));
+        EXPECT_TRUE(in1.linked_to(out1));
+
+        //test for_each_*
 		double x=3, y=5, total=0;
-		in1.distribute(x);
-		in2.distribute(y);
-		out1.collect(sum, total);
+		in1.for_each_output([x](double& z) { z = x; });
+		in2.for_each_output([y](double& z) { z = y; });
+		out1.for_each_input([&total](double z) { total+= z; });
 		EXPECT_EQ(x+y, total);
 
-		out1.distribute(total);
+		out1.for_each_output([total](double& z) { z = total; });
 		double new_total = 0;
-		in1.collect(sum, new_total);
+		in1.for_each_input([&new_total](double z) { new_total += z; });
 		EXPECT_EQ(total, new_total);
+
+        //test mirror
+        auto out1clone_ptr = new alex::Node<double>();
+        out1clone_ptr->mirror(out1);
+        //new links
+        EXPECT_TRUE(out1clone_ptr->linked_to(in1));
+        EXPECT_TRUE(out1clone_ptr->linked_to(in2));
+        EXPECT_FALSE(in1.linked_to(*out1clone_ptr));
+        //old links
+        EXPECT_TRUE(out1.linked_to(in1));
+        EXPECT_TRUE(out1.linked_to(in2));
+
+        //test unlink
+        out1clone_ptr->unlink(in1);
+        EXPECT_FALSE(out1clone_ptr->linked_to(in1));
+        EXPECT_TRUE(out1clone_ptr->linked_to(in2));
+        EXPECT_TRUE(out1.linked_to(in1)); //in case out1clone BECAME out1
+
+        //test destruction
+        EXPECT_TRUE(in2.link(*out1clone_ptr));
+        auto out1clone_copy_ptr = new alex::Node<double>(*out1clone_ptr);
+        delete out1clone_ptr; out1clone_ptr = nullptr;
+        EXPECT_TRUE(in2.linked_to(*out1clone_copy_ptr));
+
+        delete out1clone_copy_ptr; out1clone_copy_ptr = nullptr;
+        EXPECT_EQ(0, in2.size());
+
+        //test unlink_all
+        out1.unlink_all();
+        EXPECT_FALSE(out1.linked_to(in1));
+        EXPECT_FALSE(out1.linked_to(in2));
+        EXPECT_EQ(0, out1.size());
+
+        //test assignment
+        EXPECT_TRUE(out1.link(in1));
+        EXPECT_TRUE(out1.link(in2));
+        in2 = out1;
+        EXPECT_FALSE(in2.linked_to(in2));
+        EXPECT_TRUE(in2.linked_to(in1));
+        EXPECT_TRUE(in1.linked_to(in2));
+        EXPECT_TRUE(in1.linked_to(out1));
+        EXPECT_EQ(1, in1.size());
 	}	
 
-	//define some outputoperator for testing purposes
-
-	class ErrorPropagators : public ::testing::Test {
-	public:
-		typedef ben::Buffer<double, 1> link_type;
-		//typedef alex::ErrorPropagator<link_type, > unit_type;
-		//typedef ben::Graph<typename unit_type::node_type> graph_type;
-
-		//std::shared_ptr<graph_type> graph_ptr;
-	};
 }
 
 int main(int argc, char **argv) {
