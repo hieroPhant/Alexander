@@ -34,10 +34,6 @@ struct XORNetwork {
     //are computed and there is no backpropagation. 
     
     typedef alex::McCullochPittsNeuron neuron_type;
-    typedef typename neuron_type::graph_type graph_type;
-
-    //To create neurons, you need a Graph handle.
-    std::shared_ptr<typename neuron_type::graph_type> graph_ptr;
 
     //Two input neurons, two hidden neurons, and an output neuron.
     //You can think of each hidden neuron as representing a logical
@@ -48,10 +44,9 @@ struct XORNetwork {
 
     //Sets up the network, including the Graph.
     XORNetwork()  
-        : graph_ptr(new graph_type), 
-          inputA(graph_ptr, 1), inputB(graph_ptr, 1),
-          hiddenOR(graph_ptr, 1), hiddenAND(graph_ptr, 2), 
-          output(graph_ptr, 1) {
+        : inputA(1), inputB(1),
+          hiddenOR(1), hiddenAND(2), 
+          output(1) {
         //The hidden neurons are identical aside from their thresholds.
         hiddenOR.add_input(inputA, true);
         hiddenOR.add_input(inputB, true);
